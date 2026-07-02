@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MJC no Gakushuu Note | Java 后端实习路线</title>
+<meta name="description" content="Java 后端实习学习路线 - 江南大学 211 - 源码级 + AI Agent 差异化">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="sakura-canvas"></canvas>
+<div class="float-deco" style="top:10%;left:5%">⛩</div>
+<div class="float-deco" style="top:60%;right:5%;animation-delay:-10s">🎋</div>
+
+<nav>
+  <div class="nav-inner">
+    <span class="nav-logo">🌸 MJC no Gakushuu Note</span>
+    <div class="nav-links">
+      <a href="#home">首页</a>
+      <a href="#blog">博客</a>
+      <a href="#roadmap">路线图</a>
+      <a href="#weekly">周计划</a>
+      <a href="#skills">技能树</a>
+      <a href="#interview">面试题</a>
+      <a href="#data">数据</a>
+    </div>
+  </div>
+</nav>
+
+<main>
+<!-- Hero -->
+<section class="hero animate-in" id="home">
+  <h1>Java 后端实习<br>精进路线</h1>
+  <p class="subtitle">江南大学（211）· 计算机 2025 级 · 目标 2027 年日常实习</p>
+  <p class="motto">「源码级理解 + AI Agent 差异化 + 自研中间件 + 开源贡献」</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><div class="num">14</div><div class="label">周冲刺计划</div></div>
+    <div class="hero-stat"><div class="num">80</div><div class="label">LeetCode 目标</div></div>
+    <div class="hero-stat"><div class="num">1:35+</div><div class="label">初级岗竞争比</div></div>
+    <div class="hero-stat"><div class="num">4D</div><div class="label">四维区分度</div></div>
+  </div>
+</section>
+
+<!-- Blog Posts -->
+<section id="blog">
+  <div class="card animate-in">
+    <h2><span class="icon">📝</span> 博客文章</h2>
+    <div class="grid2">
+
+      <a href="posts/java-roadmap-14-weeks.html" class="blog-card animate-in">
+        <div class="blog-date">2026-06-23</div>
+        <h3 class="blog-title">Java 后端实习路线：从 0 到 Offer 的 14 周冲刺计划</h3>
+        <p class="blog-desc">江南大学 211 计算机大一升大二，目标 2027 年拿到第一份日常实习。详细拆解 14 周冲刺计划的每一天——从 Java 基础到 AI Agent 部署。</p>
+        <div class="blog-tags"><span class="tag t-java">Java</span><span class="tag t-spring">路线图</span></div>
+      </a>
+
+      <a href="posts/job-market-2026-truth.html" class="blog-card animate-in">
+        <div class="blog-date">2026-06-24</div>
+        <h3 class="blog-title">2026 就业市场真相：Java 没死，但 CRUD 的窗口已经关闭</h3>
+        <p class="blog-desc">全国 Java 岗位 42000 个，但初级岗竞争比 1:35+。阿里系 Java 岗位中 80% 要求 AI 技能。用真实数据告诉大二生该怎么准备。</p>
+        <div class="blog-tags"><span class="tag t-ai">就业分析</span><span class="tag t-redis">数据</span></div>
+      </a>
+
+      <a href="posts/ai-agent-differentiation.html" class="blog-card animate-in">
+        <div class="blog-date">2026-06-25</div>
+        <h3 class="blog-title">AI Agent + Java：大二生的差异化竞争策略</h3>
+        <p class="blog-desc">95% 的候选人简历上没有 AI 项目。用 Spring Boot + LangChain4j + DeepSeek 打造一个真正的 Agent 系统——完整架构解析。</p>
+        <div class="blog-tags"><span class="tag t-ai">AI Agent</span><span class="tag t-spring">LangChain4j</span></div>
+      </a>
+
+      <a href="posts/hashmap-source-analysis.html" class="blog-card animate-in">
+        <div class="blog-date">2026-07-01</div>
+        <h3 class="blog-title">HashMap 源码深度解析：从 put 到 resize</h3>
+        <p class="blog-desc">面试必考题！逐行分析 HashMap 的 put 方法、哈希冲突解决、红黑树转换和扩容机制——不只是背八股，而是真正看懂源码。</p>
+        <div class="blog-tags"><span class="tag t-java">源码</span><span class="tag t-mysql">面试</span></div>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- Roadmap -->
+<section id="roadmap">
+  <div class="card animate-in">
+    <h2><span class="icon">🗺</span> 学习路线总览</h2>
+    <div class="roadmap-flow">
+      <div class="flow-item"><div class="skill-emoji">☕</div><div class="skill-name">Java 核心</div><div class="skill-desc">JVM / 并发 / 集合</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-item"><div class="skill-emoji">🍃</div><div class="skill-name">Spring 全家桶</div><div class="skill-desc">Boot / Cloud / MVC</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-item"><div class="skill-emoji">🗄</div><div class="skill-name">数据库</div><div class="skill-desc">MySQL / Redis</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-item"><div class="skill-emoji">🤖</div><div class="skill-name">AI Agent</div><div class="skill-desc">LangChain4j</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-item"><div class="skill-emoji">🐳</div><div class="skill-name">部署</div><div class="skill-desc">Docker / Linux</div></div>
+    </div>
+    <p class="roadmap-note">策略：不追广度追深度 · AI 已从加分项变成必选项 · 项目深度 > 背八股</p>
+  </div>
+</section>
+<!-- 14 Week Schedule -->
+<section id="weekly">
+  <div class="card animate-in">
+    <h2><span class="icon">📅</span> 14 周冲刺计划 (6/23 - 9/28)</h2>
+    <div class="timeline">
+      <div class="ti animate-in">
+        <div class="ti-week">🌸 第 1 周 (6/23-6/29)</div>
+        <div class="ti-topic">Java 基础 & JVM 体系</div>
+        <div class="ti-tags"><span class="tag t-java">Java</span><span class="tag t-java">JVM</span></div>
+      </div>
+      <div class="ti animate-in">
+        <div class="ti-week">🌸 第 2 周 (6/30-7/6)</div>
+        <div class="ti-topic">MySQL 45讲 & 索引优化</div>
+        <div class="ti-tags"><span class="tag t-mysql">MySQL</span></div>
+      </div>
+      <div class="ti animate-in">
+        <div class="ti-week">🌸 第 3 周 (7/7-7/13)</div>
+        <div class="ti-topic">计算机网络 + LeetCode 数组/链表</div>
+        <div class="ti-tags"><span class="tag t-linux">网络</span><span class="tag t-linux">算法</span></div>
+      </div>
+      <div class="ti animate-in">
+        <div class="ti-week">🌸 第 4 周 (7/14-7/20)</div>
+        <div class="ti-topic">Spring Boot + MyBatis-Plus 基础</div>
+        <div class="ti-tags"><span class="tag t-spring">Spring</span><span class="tag t-spring">MyBatis</span></div>
+      </div>
+      <div class="ti animate-in">
+        <div class="ti-week">🌸 第 5 周 (7/21-7/27)</div>
+        <div class="ti-topic">自研 ORM/RPC + Spring 源码</div>
+        <div class="ti-tags"><span class="tag t-spring">Spring源码</span><span class="tag t-spring">自研</span></div>
+      </div>
+      <div class="ti animate-in">
+        <div class="ti-week">🌸 第 6 周 (7/28-8/3)</div>
+        <div class="ti-topic">并发编程 + LeetCode 树/DFS/BFS</div>
+        <div class="ti-tags"><span class="tag t-java">JUC</span><span class="tag t-java">算法</span></div>
+      </div>
+      <div class="ti animate-in">
+        <div class="ti-week">🌸 第 7 周 (8/4-8/10)</div>
+        <div class="ti-topic">JVM 调优 + LeetCode DP</div>
+        <div class="ti-tags"><span class="tag t-java">JVM</span><span class="tag t-java">DP</span></div>
+      </div>
+      <div class="ti animate-in">
+        <div class="ti-week">🌸 第 8 周 (8/11-8/17)</div>
+        <div class="ti-topic">操作系统 + 算法复习</div>
+        <div class="ti-tags"><span class="tag t-linux">OS</span><span class="tag t-linux">算法</span></div>
+      </div>
+      <div class="ti animate-in">
+        <div class="ti-week">🌸 第 9 周 (8/19-9/1)</div>
+        <div class="ti-topic">Spring/MyBatis 源码 + 事务传播</div>
+        <div class="ti-tags"><span class="tag t-spring">Spring源码</span><span class="tag t-spring">MyBatis</span></div>
+      </div>
+      <div class="ti animate-in">
+        <div class="ti-week">🌸 第 10 周 (9/2-9/8)</div>
+        <div class="ti-topic">Redis 深度（穿透/击穿/雪崩）</div>
+        <div class="ti-tags"><span class="tag t-redis">Redis</span><span class="tag t-redis">分布式锁</span></div>
+      </div>
+      <div class="ti animate-in">
+        <div class="ti-week">🌸 第 11 周 (9/9-9/15)</div>
+        <div class="ti-topic">自研 ORM/RPC 收尾 + 技术博客</div>
+        <div class="ti-tags"><span class="tag t-java">自研</span><span class="tag t-java">博客</span></div>
+      </div>
+      <div class="ti animate-in">
+        <div class="ti-week">🌸 第 12 周 (9/16-9/22)</div>
+        <div class="ti-topic">AI Agent 系统 (LangChain4j + DeepSeek)</div>
+        <div class="ti-tags"><span class="tag t-ai">AI</span><span class="tag t-ai">限流</span></div>
+      </div>
+      <div class="ti animate-in">
+        <div class="ti-week">🌸 第 13 周 (9/23-9/29)</div>
+        <div class="ti-topic">微服务 + Docker + 系统设计 + Go 入门</div>
+        <div class="ti-tags"><span class="tag t-docker">Docker</span><span class="tag t-docker">Go</span><span class="tag t-docker">微服务</span></div>
+      </div>
+      <div class="ti animate-in">
+        <div class="ti-week">🌸 第 14 周 (9/30-10/6)</div>
+        <div class="ti-topic">部署上线 + 简历 v1 + 博客发布 🎉</div>
+        <div class="ti-tags"><span class="tag t-docker">部署</span><span class="tag t-docker">简历</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- Skills Tree -->
+<section id="skills">
+  <div class="card animate-in">
+    <h2><span class="icon">⚡</span> 核心技能树</h2>
+    <div class="grid4">
+      <div class="skill-card animate-in">
+        <div class="skill-emoji">☕</div>
+        <div class="skill-name">Java 核心</div>
+        <div class="skill-desc">集合源码 · JVM 调优 · JUC 并发 · 锁升级</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:50%"></div></div>
+      </div>
+      <div class="skill-card animate-in">
+        <div class="skill-emoji">🍃</div>
+        <div class="skill-name">Spring 全家桶</div>
+        <div class="skill-desc">Boot 3.x · Cloud Alibaba · Bean 生命周期</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:35%"></div></div>
+      </div>
+      <div class="skill-card animate-in">
+        <div class="skill-emoji">🗄</div>
+        <div class="skill-name">数据库</div>
+        <div class="skill-desc">MySQL 索引优化 · Redis 集群 · 缓存策略</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:30%"></div></div>
+      </div>
+      <div class="skill-card animate-in">
+        <div class="skill-emoji">🤖</div>
+        <div class="skill-name">AI Agent</div>
+        <div class="skill-desc">LangChain4j · Function Calling · MCP 协议</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:15%"></div></div>
+      </div>
+      <div class="skill-card animate-in">
+        <div class="skill-emoji">🐳</div>
+        <div class="skill-name">DevOps</div>
+        <div class="skill-desc">Docker · Linux · CI/CD · 阿里云部署</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:10%"></div></div>
+      </div>
+      <div class="skill-card animate-in">
+        <div class="skill-emoji">📐</div>
+        <div class="skill-name">系统设计</div>
+        <div class="skill-desc">秒杀系统 · 短链 · 排行榜 · CAP/BASE</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:10%"></div></div>
+      </div>
+      <div class="skill-card animate-in">
+        <div class="skill-emoji">🔢</div>
+        <div class="skill-name">算法</div>
+        <div class="skill-desc">LeetCode 80 题 · 33 Easy + 37 Medium</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:5%"></div></div>
+      </div>
+      <div class="skill-card animate-in">
+        <div class="skill-emoji">🐹</div>
+        <div class="skill-name">Go 语言</div>
+        <div class="skill-desc">辅助语言 · 高并发场景 · 简历加分</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- Interview Top 10 -->
+<section id="interview">
+  <div class="card animate-in">
+    <h2><span class="icon">💬</span> 面试核心 10 题</h2>
+    <div class="grid2">
+      <div class="q-card animate-in">
+        <div class="q-num">①</div>
+        <div class="q-text"><strong>HashMap put/resize</strong><br><span style="font-size:0.9em;color:var(--text-light)">哈希冲突 · 红黑树转换 · 扩容机制</span></div>
+      </div>
+      <div class="q-card animate-in">
+        <div class="q-num">②</div>
+        <div class="q-text"><strong>Bean 生命周期 / 三级缓存</strong><br><span style="font-size:0.9em;color:var(--text-light)">实例化 → 属性填充 → 初始化 → 销毁</span></div>
+      </div>
+      <div class="q-card animate-in">
+        <div class="q-num">③</div>
+        <div class="q-text"><strong>@Transactional 失效</strong><br><span style="font-size:0.9em;color:var(--text-light)">自调用 · 非 public · 异常被 catch</span></div>
+      </div>
+      <div class="q-card animate-in">
+        <div class="q-num">④</div>
+        <div class="q-text"><strong>AQS state + CLH 队列</strong><br><span style="font-size:0.9em;color:var(--text-light)">ReentrantLock · 队列同步器原理</span></div>
+      </div>
+      <div class="q-card animate-in">
+        <div class="q-num">⑤</div>
+        <div class="q-text"><strong>synchronized 锁升级</strong><br><span style="font-size:0.9em;color:var(--text-light)">偏向锁 → 轻量锁 → 重量锁</span></div>
+      </div>
+      <div class="q-card animate-in">
+        <div class="q-num">⑥</div>
+        <div class="q-text"><strong>线程池 7 参数</strong><br><span style="font-size:0.9em;color:var(--text-light)">核心/最大/队列/拒绝策略</span></div>
+      </div>
+      <div class="q-card animate-in">
+        <div class="q-num">⑦</div>
+        <div class="q-text"><strong>B+树 vs B树 / Hash</strong><br><span style="font-size:0.9em;color:var(--text-light)">为什么 MySQL 索引用 B+树</span></div>
+      </div>
+      <div class="q-card animate-in">
+        <div class="q-num">⑧</div>
+        <div class="q-text"><strong>缓存穿透/击穿/雪崩</strong><br><span style="font-size:0.9em;color:var(--text-light)">布隆过滤器 · 互斥锁 · 随机 TTL</span></div>
+      </div>
+      <div class="q-card animate-in">
+        <div class="q-num">⑨</div>
+        <div class="q-text"><strong>Agent 运行循环</strong><br><span style="font-size:0.9em;color:var(--text-light)">Think → Act → Observe</span></div>
+      </div>
+      <div class="q-card animate-in">
+        <div class="q-num">⑩</div>
+        <div class="q-text"><strong>RAG 流程</strong><br><span style="font-size:0.9em;color:var(--text-light)">检索增强生成 · 向量数据库</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- Job Market Data -->
+<section id="data">
+  <div class="card animate-in">
+    <h2><span class="icon">📊</span> 2026 就业市场真实数据</h2>
+    <table>
+      <tr><th>指标</th><th>数据</th><th>趋势</th></tr>
+      <tr><td>全国 Java 在招岗位</td><td>~42,000</td><td>↓8%（AI 岗 ↑200%+）</td></tr>
+      <tr><td>应届生/实习岗位</td><td>~11,000</td><td>↓15%</td></tr>
+      <tr><td>初级岗竞争比</td><td>1:35+</td><td>最惨烈</td></tr>
+      <tr><td>纯 Java 应届薪资（一线）</td><td>~14.5 万/年</td><td>涨幅不足 10%</td></tr>
+      <tr><td>Java+AI 复合岗位</td><td>爆发增长 12 倍</td><td>薪资溢价 30-50%</td></tr>
+      <tr><td>阿里系 Java 岗要求 AI 技能</td><td>超 80%</td><td>去年不到 30%</td></tr>
+    </table>
+  </div>
+</section>
+<!-- Regions -->
+<section>
+  <div class="card animate-in">
+    <h2><span class="icon">🗾</span> 全国投递作战地图</h2>
+    <div class="grid3">
+      <div class="data-card animate-in">
+        <div class="skill-emoji">🏠</div>
+        <div class="skill-name">长三角</div>
+        <div class="skill-desc">上海/苏州/无锡/杭州/南京<br>~38,000 岗位<br>通勤方便 · 大二友好</div>
+      </div>
+      <div class="data-card animate-in">
+        <div class="skill-emoji">🌊</div>
+        <div class="skill-name">珠三角</div>
+        <div class="skill-desc">深圳/广州<br>~12,000 岗位<br>腾讯/华为/数字化IT</div>
+      </div>
+      <div class="data-card animate-in">
+        <div class="skill-emoji">🏯</div>
+        <div class="skill-name">北京</div>
+        <div class="skill-desc">~15,000 岗位<br>字节/美团/京东<br>211 本科难过简历</div>
+      </div>
+      <div class="data-card animate-in">
+        <div class="skill-emoji">🏔</div>
+        <div class="skill-name">成渝</div>
+        <div class="skill-desc">成都/重庆<br>~6,000 岗位<br>生活成本低 · 银行科技</div>
+      </div>
+      <div class="data-card animate-in">
+        <div class="skill-emoji">🎯</div>
+        <div class="skill-name">中西部省会</div>
+        <div class="skill-desc">武汉/西安/长沙/合肥<br>~8,000 岗位<br>竞争少 · 命中率高</div>
+      </div>
+      <div class="data-card animate-in" style="border:2px solid var(--sakura);background:rgba(255,158,197,0.05)">
+        <div class="skill-emoji">🚀</div>
+        <div class="skill-name">策略</div>
+        <div class="skill-desc">海投全国 100+ 家<br>先江浙沪 → 深圳/北京 → 全国撒网</div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- Daily Schedule -->
+<section>
+  <div class="card animate-in">
+    <h2><span class="icon">⏰</span> 每日作息 & 三大铁律</h2>
+    <div class="grid2">
+      <div class="q-card"><div class="q-num">☀</div><div class="q-text"><strong>09:00 - 11:50</strong> 学习（50min×3，每段之间起身）</div></div>
+      <div class="q-card"><div class="q-num">💻</div><div class="q-text"><strong>13:30 - 16:20</strong> 敲代码（50min×3）</div></div>
+      <div class="q-card"><div class="q-num">🏃</div><div class="q-text"><strong>16:30 - 17:30</strong> 运动</div></div>
+      <div class="q-card"><div class="q-num">🌙</div><div class="q-text"><strong>22:30</strong> 睡觉 · 周日 = 休息日</div></div>
+    </div>
+    <div class="rules-row">
+      <span class="rule r-red">🔴 项目 > 八股（区分度在于项目深度）</span>
+      <span class="rule r-blue">🔴 AI 不能贴皮（Agent 决策 + 工程化落地）</span>
+      <span class="rule r-gold">🔴 每 50 分钟起身（血栓风险，非可选项）</span>
+    </div>
+  </div>
+</section>
+
+<!-- Elevator Pitch -->
+<section>
+  <div class="card animate-in">
+    <h2><span class="icon">🎙</span> 30 秒自我介绍</h2>
+    <blockquote style="font-size:1.05em;padding:20px;border-left:4px solid var(--sakura);background:rgba(255,158,197,0.06);border-radius:0 12px 12px 0;font-style:italic;line-height:1.9">
+      "211 CS 大一，Java 后端方向，独立开发了<br>
+      <strong style="color:var(--sakura-dark)">Spring Boot + LangChain4j AI Agent 项目</strong>，<br>
+      Agent 自动调用工具分析数据生成报告，<br>
+      对 <strong style="color:var(--sakura-dark)">MCP 协议和 Function Calling</strong> 有实际经验。"
+    </blockquote>
+  </div>
+</section>
+</main>
+
+<footer>
+  <p>🌸 <a href="https://mjc-0910.github.io">mjc-0910.github.io</a> · 江南大学 2025 · Java Backend</p>
+  <p class="footer-tagline">「深度优先 · 源码级理解 · AI Agent 差异化」</p>
+  <p class="footer-built">Built with 💖 in Wuxi</p>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>

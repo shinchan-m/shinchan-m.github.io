@@ -1,0 +1,23 @@
+:root {
+  --sakura: #FF9EC5;
+  --sakura-dark: #E8709A;
+  --sky: #A8D8EA;
+  --sky-light: #D4EEF7;
+  --cream: #FFF8F0;
+  --gold: #E8C170;
+  --text: #4A3B4A;
+  --text-light: #7A6B7A;
+  --card: rgba(255,255,255,0.85);
+  --card-border: rgba(255,158,197,0.3);
+  --shadow: 0 4px 20px rgba(255,158,197,0.15);
+  --shadow-hover: 0 8px 32px rgba(255,158,197,0.25);
+  --nav-bg: rgba(255,248,240,0.92);
+  --tag-java: #E8709A;
+  --tag-spring: #6DBF6D;
+  --tag-redis: #E87070;
+  --tag-ai: #9B6DFF;
+  --tag-docker: #4DA6D9;
+  --tag-go: #6DD5D8;
+  --tag-mysql: #E8964A;
+  --tag-linux: #555;
+}
