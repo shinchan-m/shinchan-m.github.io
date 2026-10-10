@@ -2,7 +2,7 @@
 
 > Java Backend Internship Learning Roadmap ? Anime Sakura Theme
 
-**https://mjc-0910.github.io**
+**https://shinchan-m.github.io**
 
 ## About
 
@@ -24,13 +24,13 @@ Built with pure HTML/CSS/JS, deployable directly to GitHub Pages.
 
 ## Deploy
 
-Push to `main` branch of `mjc-0910.github.io` repo:
+Push to `main` branch of `shinchan-m.github.io` repo:
 
 ```bash
 git init
 git add .
 git commit -m "?? Anime sakura theme blog"
-git remote add origin https://github.com/mjc-0910/mjc-0910.github.io.git
+git remote add origin https://github.com/shinchan-m/shinchan-m.github.io.git
 git push -u origin main
 ```
 

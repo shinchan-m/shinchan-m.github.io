@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>在 Windows 上用 Docker 跑 Linux 版 MySQL 的完整过程 | MJC no Gakushuu Note</title>
+<link rel="stylesheet" href="../style.css">
+<style>
+  .post-header { text-align:center; padding:80px 20px 30px; }
+  .post-header h1 { font-size:2em; color:var(--text); margin-bottom:16px; }
+  .post-meta { color:var(--text-light); font-size:0.9em; margin-bottom:12px; }
+  .post-content { max-width:800px; margin:0 auto; padding:20px; }
+  .post-content h2 { font-size:1.4em; color:var(--sakura-dark); margin:32px 0 12px; padding-left:12px; border-left:4px solid var(--sakura); }
+  .post-content h3 { font-size:1.1em; margin:24px 0 8px; color:var(--text); }
+  .post-content p { margin-bottom:16px; font-size:1.05em; line-height:2; }
+  .post-content ul, .post-content ol { margin:12px 0 20px 24px; }
+  .post-content li { margin-bottom:8px; line-height:1.8; }
+  .post-content code { background:rgba(255,158,197,0.12); padding:2px 8px; border-radius:4px; font-size:0.9em; font-family:"Cascadia Code","Fira Code",monospace; }
+  .post-content pre { background:#2d2438; color:#f5eef8; padding:16px 18px; border-radius:8px; overflow-x:auto; margin:16px 0; line-height:1.7; }
+  .post-content pre code { background:none; padding:0; color:inherit; font-size:0.9em; }
+  .post-content table { width:100%; border-collapse:collapse; margin:20px 0; }
+  .post-content th { background:linear-gradient(135deg,rgba(255,158,197,0.2),rgba(200,112,232,0.15)); padding:10px 12px; text-align:left; }
+  .post-content td { padding:10px 12px; border-bottom:1px solid var(--card-border); }
+  .post-content strong { color:var(--sakura-dark); }
+  .post-content blockquote { border-left:4px solid var(--sky); margin:16px 0; padding:8px 16px; color:var(--text-light); background:rgba(168,216,234,0.1); border-radius:0 8px 8px 0; }
+  .back-link { display:inline-block; margin:40px 0; color:var(--sakura-dark); text-decoration:none; font-size:0.95em; }
+  .back-link:hover { text-decoration:underline; }
+  @media(max-width:768px){ .post-content { padding:16px; } .post-header h1 { font-size:1.4em; } }
+</style>
+</head>
+<body>
+<canvas id="sakura-canvas"></canvas>
+<nav>
+  <div class="nav-inner">
+    <span class="nav-logo">🌸 MJC no Gakushuu Note</span>
+    <div class="nav-links">
+      <a href="../index.html">Home</a>
+      <a href="../index.html#blog">Blog</a>
+    </div>
+  </div>
+</nav>
+<main>
+  <article>
+    <div class="post-header">
+      <h1>在 Windows 上用 Docker 跑 Linux 版 MySQL 的完整过程</h1>
+      <div class="post-meta">📅 2026-10-10 &nbsp;|&nbsp; <span class="tag t-docker">Docker</span> <span class="tag t-mysql">MySQL</span> <span class="tag t-java">环境搭建</span></div>
+      <p style="color:var(--text-light);max-width:600px;margin:12px auto;font-size:0.95em">不想装虚拟机？用 WSL2 + Docker Desktop 在 Windows 里跑一个 Linux 版 MySQL 8.0.26，程序和所有数据都放 D 盘，开机自动启动。</p>
+    </div>
+    <div class="post-content card">
+      <p>学 MySQL 的时候，课程一路讲到最后，索引那部分突然换到了 Linux 环境演示。老师建议装虚拟机或者买台云服务器，我电脑上本来就有 Windows 版 MySQL，不想为了几节课再背一个虚拟机，就试着用 Docker 在 Windows 里跑一个 Linux 版 MySQL。</p>
+      <p>中间踩了几个坑，写下来给同样卡住的人。做完之后的效果是这样的，开机后 Docker 和 MySQL 自动启动，打开 DataGrip 连 <code>localhost:3307</code> 就能用，程序和所有数据都放在 D 盘，平时完全不用管。</p>
+      <h2>需要准备什么</h2>
+      <p>Windows 11 就行，家庭版也没问题，我用的就是家庭版。内存 8GB 能跑，16GB 会宽松一些。D 盘留出 10GB 左右，后面镜像和数据都放这里。另外下载 WSL 组件和 Docker 安装包需要网络通畅，这一步耐心一点。</p>
+      <h2>第一步，装 WSL2</h2>
+      <p>Docker 在 Windows 上跑 Linux 容器，底层靠的是 WSL2，可以把它理解成 Windows 里内置的一个轻量 Linux，所以先装它。</p>
+      <p>以管理员身份打开 PowerShell，运行这一条。</p>
+      <pre><code class="language-powershell">wsl --install --no-distribution --web-download
+      </code></pre>
+      <p>这里是我遇到的第一个坑。我最初跑的是 <code>wsl --install --no-distribution</code>，命令执行后半天没有任何输出，不报错也不出进度条，看着像卡死。查了资料才知道它默认从微软商店下载组件，国内网络下经常卡住不动。加上 <code>--web-download</code> 之后进度条马上出来了，几分钟装完。</p>
+      <p>装完用下面这条确认。</p>
+      <pre><code class="language-powershell">wsl --version
+      </code></pre>
+      <p>能看到版本号（我装出来是 3.0.1）就说明这步过了。</p>
+      <h2>第二步，下载 Docker Desktop 安装包</h2>
+      <p>直接下到我们最终要用的目录里。</p>
+      <pre><code class="language-powershell">mkdir D:\Docker -Force
+      curl.exe -L -o &quot;D:\Docker\DockerDesktopInstaller.exe&quot; &quot;https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe&quot;
+      </code></pre>
+      <p>安装包六百多兆，网络不好时多等一会儿。</p>
+      <h2>第三步，把 Docker 装到 D 盘</h2>
+      <p>这是我踩的最大的坑。我第一次直接双击安装包一路点下一步，装完才发现它默认装到了 C 盘的 AppData 目录里。我的习惯是开发工具都放 D 盘，就想着把文件夹挪过去，结果发现 Docker Desktop 不能直接剪切搬家，它涉及注册表、后台服务和 WSL 集成，复制过去会坏。</p>
+      <p>正确做法是卸载掉装错的那份，用命令行参数重新安装。</p>
+      <pre><code class="language-powershell">&amp; &quot;C:\Users\你的用户名\AppData\Local\Programs\DockerDesktop\Docker Desktop Installer.exe&quot; uninstall --quiet
+      </code></pre>
+      <p>然后用参数重装。</p>
+      <pre><code class="language-powershell">Start-Process &quot;D:\Docker\DockerDesktopInstaller.exe&quot; -Wait -ArgumentList `
+        'install','--user','--accept-license','--backend=wsl-2',`
+        '--installation-dir=D:\Docker\DockerDesktop',`
+        '--wsl-default-data-root=D:\Docker\data'
+      </code></pre>
+      <p>几个参数的含义说一下。<code>--installation-dir</code> 决定程序装在哪，<code>--wsl-default-data-root</code> 决定 Docker 的镜像和容器数据放哪，后者才是占空间的大头。<code>--user</code> 表示按当前用户安装，以后更新不用每次找管理员权限。装完可以去 <code>D:\Docker</code> 看一眼，程序在 DockerDesktop 文件夹，数据在 data 文件夹。</p>
+      <h2>第四步，配置镜像加速</h2>
+      <p>启动 Docker Desktop，接受协议，跳过登录，等右下角任务栏的小鲸鱼变成绿色，说明引擎起来了。然后试着拉镜像。</p>
+      <pre><code class="language-powershell">docker pull mysql:8.0.26
+      </code></pre>
+      <p>这里大概率会失败，提示连不上 <code>registry-1.docker.io</code>。Docker Hub 在国内直连经常超时，解决办法是配置镜像加速。打开 <code>C:\Users\你的用户名\.docker\daemon.json</code>，没有这个文件就新建一个，写入下面内容。</p>
+      <pre><code class="language-json">{
+        &quot;registry-mirrors&quot;: [
+          &quot;https://docker.m.daocloud.io&quot;,
+          &quot;https://docker.1ms.run&quot;,
+          &quot;https://docker.xuanyuan.me&quot;
+        ]
+      }
+      </code></pre>
+      <p>改完在任务栏的鲸鱼图标上右键重启 Docker Desktop。重新拉镜像，这次很快就下完了。</p>
+      <h2>第五步，启动 MySQL 容器</h2>
+      <pre><code class="language-powershell">docker run -d --name mysql8 -p 3307:3306 -e MYSQL_ROOT_PASSWORD=1234 -v D:\Docker\mysql\data:/var/lib/mysql --restart unless-stopped mysql:8.0.26
+      </code></pre>
+      <p>这条命令里的参数都挺有用，挨个说。<code>-p 3307:3306</code> 把容器里的 3306 端口映射到本机的 3307，用 3307 是因为我电脑上本来就有一个 Windows 版 MySQL 占着 3306，两个错开互不影响。<code>-v</code> 那段把数据库文件挂载到 D 盘，以后就算删掉容器，数据也还在。<code>--restart unless-stopped</code> 让容器跟着 Docker 开机自启。镜像版本特意选了 8.0.26，和课程保持一致。</p>
+      <p>等半分钟左右初始化，然后检查。</p>
+      <pre><code class="language-powershell">docker ps
+      docker exec mysql8 mysql -uroot -p1234 -e &quot;SELECT VERSION();&quot;
+      </code></pre>
+      <p>第一条能看到 mysql8 的状态是 Up，第二条能打印出 8.0.26，就成功了。</p>
+      <h2>第六步，用 DataGrip 连接</h2>
+      <p>新建 MySQL 数据源，按下面填。</p>
+      <table>
+      <thead>
+      <tr>
+      <th>项</th>
+      <th>值</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+      <td>主机</td>
+      <td>localhost</td>
+      </tr>
+      <tr>
+      <td>端口</td>
+      <td>3307</td>
+      </tr>
+      <tr>
+      <td>用户</td>
+      <td>root</td>
+      </tr>
+      <tr>
+      <td>密码</td>
+      <td>1234</td>
+      </tr>
+      </tbody>
+      </table>
+      <p>测试连接，看到绿色对勾就能开始用了。</p>
+      <h2>让它在开机时自动启动</h2>
+      <p>Docker Desktop 设置里虽然有开机启动的开关，但有时候配置不生效，稳妥的办法是直接改配置文件。打开 <code>C:\Users\你的用户名\AppData\Roaming\Docker\settings-store.json</code>，找到 <code>AutoStart</code> 这一项，改成 true。</p>
+      <pre><code class="language-json">{
+        &quot;AutoStart&quot;: true
+      }
+      </code></pre>
+      <p>这样开机后 Docker 自动启动，MySQL 容器也跟着起来（靠前面配好的 <code>--restart unless-stopped</code>）。以后每天的流程就是开机，等一两分钟，打开 DataGrip 直接用。</p>
+      <h2>最后，文件都在哪</h2>
+      <pre><code class="language-text">D:\Docker\DockerDesktop    Docker 程序
+      D:\Docker\data             Docker 引擎数据
+      D:\Docker\mysql\data       MySQL 数据
+      </code></pre>
+      <p>原来的 Windows 版 MySQL 我没动，还在 3306 端口上，两个数据库互不影响，课程实验统一用新的 3307 这个。几个常用的容器命令也放这里备查。</p>
+      <pre><code class="language-powershell">docker stop mysql8     # 停止 MySQL
+      docker start mysql8    # 启动 MySQL
+      docker logs mysql8     # 查看日志
+      </code></pre>
+      <p>到这里环境就配好了。整个方案适合不想装虚拟机的人，如果你也在跟这门课，学到 Linux 部分的时候可以参考。</p>
+      <div style="text-align:center">
+        <a href="../index.html#blog" class="back-link">← Back to Blog</a>
+      </div>
+    </div>
+  </article>
+</main>
+<footer>
+  <p>🌸 <a href="https://shinchan-m.github.io">shinchan-m.github.io</a> · Jiangnan University 2025</p>
+</footer>
+<script src="../app.js"></script>
+</body>
+</html>
