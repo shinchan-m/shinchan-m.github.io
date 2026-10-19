@@ -1,5 +1,5 @@
 /* ===== 🌸 MJC no Gakushuu Note — Anime Sakura Theme ===== */
-@import url("./vars.css?v=20261019a");
+@import url("./vars.css?v=20261019b");
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -150,6 +150,80 @@ section { margin: 40px 0; }
 }
 
 .hero-stat .label { font-size: 0.75em; color: var(--text-light); margin-top: 2px; }
+
+/* ===== 首屏书店入口（2026-10-19）===== */
+.store-entry {
+  position: relative; display: flex; align-items: center; gap: 26px;
+  max-width: 860px; margin: 0 auto 26px; padding: 34px 38px;
+  border-radius: 22px; text-decoration: none; color: #f3ecf6;
+  background:
+    radial-gradient(120% 90% at 85% 10%, rgba(232,112,154,0.28), transparent 55%),
+    radial-gradient(90% 120% at 12% 100%, rgba(120,90,200,0.30), transparent 60%),
+    linear-gradient(160deg, #221a2e 0%, #171426 45%, #10131f 100%);
+  border: 1px solid rgba(255,158,197,0.28);
+  box-shadow: 0 24px 60px rgba(20,10,40,0.45), inset 0 1px 0 rgba(255,255,255,0.08);
+  overflow: hidden; isolation: isolate;
+  transition: transform .35s ease, box-shadow .35s ease, border-color .35s ease;
+}
+.store-entry:hover {
+  transform: translateY(-4px); border-color: rgba(255,158,197,0.55);
+  box-shadow: 0 30px 70px rgba(20,10,40,0.55), 0 0 0 1px rgba(255,158,197,0.18), inset 0 1px 0 rgba(255,255,255,0.10);
+}
+.store-entry::before { /* 雨丝 */
+  content: ""; position: absolute; inset: -60px; z-index: -1; opacity: .35;
+  background: repeating-linear-gradient(115deg, transparent 0 14px, rgba(190,215,255,0.10) 14px 15px);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 30%, transparent 92%);
+  mask-image: linear-gradient(to bottom, transparent, #000 30%, transparent 92%);
+  animation: storeRain 9s linear infinite;
+}
+@keyframes storeRain { from { transform: translate3d(0,0,0); } to { transform: translate3d(-120px,240px,0); } }
+.store-entry::after { /* 橱窗暖光 */
+  content: ""; position: absolute; right: -60px; top: -80px; width: 260px; height: 260px; z-index: -1;
+  background: radial-gradient(circle, rgba(255,214,150,0.35), transparent 65%);
+  filter: blur(6px);
+}
+.store-mark {
+  flex: 0 0 auto; width: 64px; height: 66px; display: grid; place-items: center;
+  font: 600 30px/1 Georgia, "Noto Serif SC", serif; color: #ffd9e6;
+  border: 1px solid rgba(255,255,255,0.35); border-radius: 14px;
+  background: linear-gradient(150deg, rgba(255,158,197,0.22), rgba(255,255,255,0.04));
+  box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+}
+.store-copy { display: flex; flex-direction: column; gap: 8px; text-align: left; min-width: 0; flex: 1; }
+.store-eyebrow { font-size: 0.68em; letter-spacing: 3px; color: #d9b98c; }
+.store-title {
+  font-size: 1.9em; font-weight: 800; letter-spacing: 2px;
+  background: linear-gradient(120deg, #ffe3ee, #ffc0d8 55%, #e9b7ff);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+.store-desc { font-size: 0.92em; line-height: 1.9; color: rgba(240,232,244,0.78); }
+.store-cta {
+  align-self: flex-start; margin-top: 4px; padding: 9px 22px; border-radius: 999px;
+  font-size: 0.86em; font-weight: 700; letter-spacing: 1px; color: #2b1c33;
+  background: linear-gradient(120deg, #ffd9a0, #f6b767);
+  box-shadow: 0 6px 18px rgba(246,183,103,0.28);
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+.store-cta i { font-style: normal; display: inline-block; transition: transform .25s ease; }
+.store-entry:hover .store-cta { transform: translateY(-1px); box-shadow: 0 10px 24px rgba(246,183,103,0.4); }
+.store-entry:hover .store-cta i { transform: translate(2px, -2px); }
+.store-shelf { /* 架上五本书 */
+  flex: 0 0 auto; display: flex; align-items: flex-end; gap: 7px; height: 96px;
+  padding: 0 6px 10px; border-bottom: 3px solid rgba(255,214,150,0.5);
+}
+.store-shelf i {
+  width: 15px; border-radius: 3px 3px 1px 1px; transform-origin: bottom center;
+  box-shadow: inset -3px 0 6px rgba(0,0,0,0.35), 0 4px 10px rgba(0,0,0,0.35);
+  transition: transform .3s ease;
+}
+.store-shelf i:nth-child(1) { height: 78px; background: linear-gradient(#8f6bb8, #6d4c96); }
+.store-shelf i:nth-child(2) { height: 88px; background: linear-gradient(#e8709a, #c05580); }
+.store-shelf i:nth-child(3) { height: 70px; background: linear-gradient(#5f9ec7, #46799c); transform: rotate(-4deg) translateX(2px); }
+.store-shelf i:nth-child(4) { height: 84px; background: linear-gradient(#d9a441, #b07f2c); }
+.store-shelf i:nth-child(5) { height: 74px; background: linear-gradient(#79b98c, #55906a); }
+.store-entry:hover .store-shelf i:nth-child(3) { transform: rotate(-10deg) translateX(4px); }
+.store-entry:hover .store-shelf i:nth-child(2) { transform: translateY(-6px); }
+.hero-meta { margin-top: 4px; }
 
 /* Cards */
 .card {
@@ -411,6 +485,10 @@ footer a { color: var(--sakura-dark); text-decoration: none; }
   .flow-arrow { transform: rotate(90deg); }
   .to-top { right: 14px; bottom: 14px; width: 44px; height: 44px; }
   .binft { font-size: 0.85em; }
+  .store-entry { flex-direction: column; align-items: stretch; gap: 18px; padding: 26px 22px; }
+  .store-mark { width: 52px; height: 54px; font-size: 24px; }
+  .store-title { font-size: 1.5em; }
+  .store-shelf { height: 76px; align-self: flex-start; }
 }
 
 /* ============================================================
