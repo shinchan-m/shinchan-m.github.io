@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>MJC no Gakushuu Note</title>
+    <link>https://shinchan-m.github.io/</link>
+    <description>Java 后端实习精进路线 · 源码级理解 + AI Agent 差异化 · 二次元樱花主题</description>
+    <language>zh-cn</language>
+    <lastBuildDate>Mon, 19 Oct 2026 12:49:07 GMT</lastBuildDate>
+    <ttl>60</ttl>
+    <atom:link href="https://shinchan-m.github.io/feed.xml" rel="self" type="application/rss+xml"/>
+  <item>
+    <title>在 Windows 上用 Docker 跑 Linux 版 MySQL 的完整过程</title>
+    <link>https://shinchan-m.github.io/posts/windows-docker-linux-mysql.html</link>
+    <guid isPermaLink="true">https://shinchan-m.github.io/posts/windows-docker-linux-mysql.html</guid>
+    <pubDate>Sat, 10 Oct 2026 00:00:00 GMT</pubDate>
+    <description>不想装虚拟机？用 WSL2 + Docker Desktop 在 Windows 里跑一个 Linux 版 MySQL 8.0.26，程序和所有数据都放 D 盘，开机自动启动。</description>
+    <content:encoded><![CDATA[<p>学 MySQL 的时候，课程一路讲到最后，索引那部分突然换到了 Linux 环境演示。老师建议装虚拟机或者买台云服务器，我电脑上本来就有 Windows 版 MySQL，不想为了几节课再背一个虚拟机，就试着用 Docker 在 Windows 里跑一个 Linux 版 MySQL。</p>
+      <p>中间踩了几个坑，写下来给同样卡住的人。做完之后的效果是这样的，开机后 Docker 和 MySQL 自动启动，打开 DataGrip 连 <code>localhost:3307</code> 就能用，程序和所有数据都放在 D 盘，平时完全不用管。</p>
+      <h2>需要准备什么</h2>
+      <p>Windows 11 就行，家庭版也没问题，我用的就是家庭版。内存 8GB 能跑，16GB 会宽松一些。D 盘留出 10GB 左右，后面镜像和数据都放这里。另外下载 WSL 组件和 Docker 安装包需要网络通畅，这一步耐心一点。</p>
+      <h2>第一步，装 WSL2</h2>
+      <p>Docker 在 Windows 上跑 Linux 容器，底层靠的是 WSL2，可以把它理解成 Windows 里内置的一个轻量 Linux，所以先装它。</p>
+      <p>以管理员身份打开 PowerShell，运行这一条。</p>
+      <pre><code class="language-powershell">wsl --install --no-distribution --web-download
+      </code></pre>
+      <p>这里是我遇到的第一个坑。我最初跑的是 <code>wsl --install --no-distribution</code>，命令执行后半天没有任何输出，不报错也不出进度条，看着像卡死。查了资料才知道它默认从微软商店下载组件，国内网络下经常卡住不动。加上 <code>--web-download</code> 之后进度条马上出来了，几分钟装完。</p>
+      <p>装完用下面这条确认。</p>
+      <pre><code class="language-powershell">wsl --version
+      </code></pre>
+      <p>能看到版本号（我装出来是 3.0.1）就说明这步过了。</p>
+      <h2>第二步，下载 Docker Desktop 安装包</h2>
+      <p>直接下到我们最终要用的目录里。</p>
+      <pre><code class="language-powershell">mkdir D:\Docker -Force
+      curl.exe -L -o &quot;D:\Docker\DockerDesktopInstaller.exe&quot; &quot;https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe&quot;
+      </code></pre>
+      <p>安装包六百多兆，网络不好时多等一会儿。</p>
+      <h2>第三步，把 Docker 装到 D 盘</h2>
+      <p>这是我踩的最大的坑。我第一次直接双击安装包一路点下一步，装完才发现它默认装到了 C 盘的 AppData 目录里。我的习惯是开发工具都放 D 盘，就想着把文件夹挪过去，结果发现 Docker Desktop 不能直接剪切搬家，它涉及注册表、后台服务和 WSL 集成，复制过去会坏。</p>
+      <p>正确做法是卸载掉装错的那份，用命令行参数重新安装。</p>
+      <pre><code class="language-powershell">&amp; &quot;C:\Users\你的用户名\AppData\Local\Programs\DockerDesktop\Docker Desktop Installer.exe&quot; uninstall --quiet
+      </code></pre>
+      <p>然后用参数重装。</p>
+      <pre><code class="language-powershell">Start-Process &quot;D:\Docker\DockerDesktopInstaller.exe&quot; -Wait -ArgumentList `
+        'install','--user','--accept-license','--backend=wsl-2',`
+        '--installation-dir=D:\Docker\DockerDesktop',`
+        '--wsl-default-data-root=D:\Docker\data'
+      </code></pre>
+      <p>几个参数的含义说一下。<code>--installation-dir</code> 决定程序装在哪，<code>--wsl-default-data-root</code> 决定 Docker 的镜像和容器数据放哪，后者才是占空间的大头。<code>--user</code> 表示按当前用户安装，以后更新不用每次找管理员权限。装完可以去 <code>D:\Docker</code> 看一眼，程序在 DockerDesktop 文件夹，数据在 data 文件夹。</p>
+      <h2>第四步，配置镜像加速</h2>
+      <p>启动 Docker Desktop，接受协议，跳过登录，等右下角任务栏的小鲸鱼变成绿色，说明引擎起来了。然后试着拉镜像。</p>
+      <pre><code class="language-powershell">docker pull mysql:8.0.26
+      </code></pre>
+      <p>这里大概率会失败，提示连不上 <code>registry-1.docker.io</code>。Docker Hub 在国内直连经常超时，解决办法是配置镜像加速。打开 <code>C:\Users\你的用户名\.docker\daemon.json</code>，没有这个文件就新建一个，写入下面内容。</p>
+      <pre><code class="language-json">{
+        &quot;registry-mirrors&quot;: [
+          &quot;https://docker.m.daocloud.io&quot;,
+          &quot;https://docker.1ms.run&quot;,
+          &quot;https://docker.xuanyuan.me&quot;
+        ]
+      }
+      </code></pre>
+      <p>改完在任务栏的鲸鱼图标上右键重启 Docker Desktop。重新拉镜像，这次很快就下完了。</p>
+      <h2>第五步，启动 MySQL 容器</h2>
+      <pre><code class="language-powershell">docker run -d --name mysql8 -p 3307:3306 -e MYSQL_ROOT_PASSWORD=1234 -v D:\Docker\mysql\data:/var/lib/mysql --restart unless-stopped mysql:8.0.26
+      </code></pre>
+      <p>这条命令里的参数都挺有用，挨个说。<code>-p 3307:3306</code> 把容器里的 3306 端口映射到本机的 3307，用 3307 是因为我电脑上本来就有一个 Windows 版 MySQL 占着 3306，两个错开互不影响。<code>-v</code> 那段把数据库文件挂载到 D 盘，以后就算删掉容器，数据也还在。<code>--restart unless-stopped</code> 让容器跟着 Docker 开机自启。镜像版本特意选了 8.0.26，和课程保持一致。</p>
+      <p>等半分钟左右初始化，然后检查。</p>
+      <pre><code class="language-powershell">docker ps
+      docker exec mysql8 mysql -uroot -p1234 -e &quot;SELECT VERSION();&quot;
+      </code></pre>
+      <p>第一条能看到 mysql8 的状态是 Up，第二条能打印出 8.0.26，就成功了。</p>
+      <h2>第六步，用 DataGrip 连接</h2>
+      <p>新建 MySQL 数据源，按下面填。</p>
+      <table>
+      <thead>
+      <tr>
+      <th>项</th>
+      <th>值</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+      <td>主机</td>
+      <td>localhost</td>
+      </tr>
+      <tr>
+      <td>端口</td>
+      <td>3307</td>
+      </tr>
+      <tr>
+      <td>用户</td>
+      <td>root</td>
+      </tr>
+      <tr>
+      <td>密码</td>
+      <td>1234</td>
+      </tr>
+      </tbody>
+      </table>
+      <p>测试连接，看到绿色对勾就能开始用了。</p>
+      <h2>让它在开机时自动启动</h2>
+      <p>Docker Desktop 设置里虽然有开机启动的开关，但有时候配置不生效，稳妥的办法是直接改配置文件。打开 <code>C:\Users\你的用户名\AppData\Roaming\Docker\settings-store.json</code>，找到 <code>AutoStart</code> 这一项，改成 true。</p>
+      <pre><code class="language-json">{
+        &quot;AutoStart&quot;: true
+      }
+      </code></pre>
+      <p>这样开机后 Docker 自动启动，MySQL 容器也跟着起来（靠前面配好的 <code>--restart unless-stopped</code>）。以后每天的流程就是开机，等一两分钟，打开 DataGrip 直接用。</p>
+      <h2>最后，文件都在哪</h2>
+      <pre><code class="language-text">D:\Docker\DockerDesktop    Docker 程序
+      D:\Docker\data             Docker 引擎数据
+      D:\Docker\mysql\data       MySQL 数据
+      </code></pre>
+      <p>原来的 Windows 版 MySQL 我没动，还在 3306 端口上，两个数据库互不影响，课程实验统一用新的 3307 这个。几个常用的容器命令也放这里备查。</p>
+      <pre><code class="language-powershell">docker stop mysql8     # 停止 MySQL
+      docker start mysql8    # 启动 MySQL
+      docker logs mysql8     # 查看日志
+      </code></pre>
+      <p>到这里环境就配好了。整个方案适合不想装虚拟机的人，如果你也在跟这门课，学到 Linux 部分的时候可以参考。</p>
+      <div style="text-align:center">
+        <a href="../index.html#blog" class="back-link">← Back to Blog</a>
+      </div>]]></content:encoded>
+  </item>
+  <item>
+    <title>HashMap 源码深度解析：从 put 到 resize</title>
+    <link>https://shinchan-m.github.io/posts/hashmap-source-analysis.html</link>
+    <guid isPermaLink="true">https://shinchan-m.github.io/posts/hashmap-source-analysis.html</guid>
+    <pubDate>Wed, 01 Jul 2026 00:00:00 GMT</pubDate>
+    <description>面试必考题！逐行分析 HashMap 的 put 方法、哈希冲突解决、红黑树转换和扩容机制——不只是背八股，而是真正看懂源码。</description>
+    <content:encoded><![CDATA[<h2>面试为什么爱问 HashMap 源码而不是背八股</h2>
+<p>因为它一道题能考出四层东西：<strong>数组 + 链表 + 红黑树的组合设计、哈希扰动函数的用意、扩容时避免重算 hash 的技巧，以及 JDK 1.7 到 1.8 的改动动机</strong>。把这四层讲通，等于当场证明你真的打开过 <code>java.util.HashMap</code> 这个文件，而不是背了一份面经。</p>
+
+<h2>底层结构是一个数组 + 链表 + 红黑树</h2>
+<p>JDK 1.8 里，HashMap 的主体是 <code>Node&lt;K,V&gt;[] table</code> 这个数组，也叫桶（bucket）。发生哈希冲突时，同一个桶里的节点挂成链表；当<strong>链表长度 ≥ 8 且数组容量 ≥ 64</strong> 时，链表转成红黑树，把最坏情况的查询从 O(n) 降到 O(log n)。</p>
+<p>注意这两个条件是「且」的关系：如果容量还不到 64，<code>treeifyBin</code> 会选择先扩容而不是树化——因为此时冲突多的真正原因是桶太少，扩容比换数据结构更划算。</p>
+
+<h2>put 方法流程</h2>
+<ol>
+  <li>计算 key 的 hash：<code>(h = key.hashCode()) ^ (h &gt;&gt;&gt; 16)</code>，把高 16 位异或进低 16 位，让高位也参与寻址，减少碰撞。</li>
+  <li>定位桶下标：<code>(n - 1) &amp; hash</code>，在容量是 2 的幂时等价于取模，但位运算快得多。</li>
+  <li>桶为空，直接放入新节点，结束。</li>
+  <li>桶不空，先比较首节点的 key 是否相同，相同则准备覆盖 value。</li>
+  <li>首节点不同就遍历链表（或树），找到相同 key 则替换 value，否则尾插一个新节点。</li>
+  <li>插入后如果链表长度 ≥ 8，调用 <code>treeifyBin</code> 尝试树化。</li>
+  <li>最后自增 <code>size</code>，若超过 <code>threshold</code> 则触发扩容。</li>
+</ol>
+
+<pre><code>// JDK 1.8 HashMap#hash —— 扰动函数
+static final int hash(Object key) {
+    int h;
+    return (key == null) ? 0 : (h = key.hashCode()) ^ (h &gt;&gt;&gt; 16);
+}
+
+// 为什么容量必须是 2 的幂：让 (n - 1) &amp; hash 等价于 hash % n
+// n = 16 时，n - 1 = 0b1111，正好掩掉高位，只留低 4 位做下标
+index = (n - 1) &amp; hash;</code></pre>
+
+<h2>resize 扩容机制</h2>
+<p>每次扩容为原来的两倍。JDK 1.8 的巧妙之处在于<strong>不需要重新计算 hash</strong>：容量翻倍意味着下标多用到 hash 的一个新二进制位，所以只要看原 hash 值在这个新增位上是 0 还是 1，就能确定节点的去向。</p>
+<ul>
+  <li>新增位为 0：下标不变，节点留在原位置（源码里的 <code>lo</code> 链）。</li>
+  <li>新增位为 1：新下标 = 原下标 + 原容量（源码里的 <code>hi</code> 链）。</li>
+</ul>
+
+<pre><code>// resize() 中拆分链表的核心判断，oldCap 是扩容前的容量
+if ((e.hash &amp; oldCap) == 0)
+    // 落在 lo 链：新下标 == 原下标 j
+else
+    // 落在 hi 链：新下标 == j + oldCap</code></pre>
+
+<p>一次位运算替代一次完整的 rehash，这就是 1.8 相对 1.7 在扩容上的主要优化。</p>
+
+<h2>几个易错点</h2>
+<ul>
+  <li>容量为什么必须是 2 的幂？为了让 <code>(n - 1) &amp; hash</code> 能等价于取模，同时保证位分布均匀。</li>
+  <li>负载因子为什么默认 0.75？空间与时间的折中：再高冲突概率显著上升，再低则浪费内存、频繁扩容。</li>
+  <li>JDK 1.7 的头插法在 1.8 改成了尾插法，因为 1.7 在并发扩容时可能形成环形链表，导致 get 死循环。</li>
+  <li>为什么用红黑树而不是 AVL 树？红黑树的插入旋转次数更少，在频繁写入的场景综合代价更低。</li>
+</ul>
+<blockquote>顺带一提：HashMap 本身不是线程安全的。上面第 3 条讲的死循环只是 1.7 的表现，1.8 改成尾插后不会再成环，但并发下依然会丢数据——要并发就用 <code>ConcurrentHashMap</code>。</blockquote>
+
+<p><strong>能把「结构 → put → resize」这三层串起来讲清楚，HashMap 这道题就稳了。</strong></p>
+
+      <div style="text-align:center">
+        <a href="../index.html#blog" class="back-link">← Back to Blog</a>
+      </div>]]></content:encoded>
+  </item>
+  <item>
+    <title>AI Agent + Java：大二生的差异化竞争策略</title>
+    <link>https://shinchan-m.github.io/posts/ai-agent-differentiation.html</link>
+    <guid isPermaLink="true">https://shinchan-m.github.io/posts/ai-agent-differentiation.html</guid>
+    <pubDate>Thu, 25 Jun 2026 00:00:00 GMT</pubDate>
+    <description>95% 的候选人简历上没有 AI 项目。用 Spring Boot + LangChain4j + DeepSeek 打造一个真正的 Agent 系统——完整架构解析与工程化落地细节。</description>
+    <content:encoded><![CDATA[<h2>为什么选择 AI Agent 差异化路线</h2>
+<p>2026 年的就业市场上，Java 岗位对 AI 技能的要求已经从去年的不到 30% 涨到了 80%。但与此同时，<strong>95% 的应届生简历上没有任何一个像样的 AI 项目</strong>——需求在猛涨，供给还没跟上，这就是大二学生能钻进去的窗口期。</p>
+<p>要注意区分两件事：调一次大模型 API 做个聊天框，那叫「贴皮」；让模型自己决定调用哪个工具、拿到结果后继续推理，那才叫 Agent。面试官一眼就能看出差别，本文讲的是后者。</p>
+
+<h2>技术选型</h2>
+<ul>
+  <li><strong>后端框架</strong>：Spring Boot 3.x（JDK 17 起，虚拟线程可选）</li>
+  <li><strong>AI 编排</strong>：LangChain4j，Java 生态里的 LangChain 对应物</li>
+  <li><strong>LLM</strong>：DeepSeek API，国产、便宜，原生支持 Function Calling</li>
+  <li><strong>数据层</strong>：MySQL + Redis（业务数据 + 限流计数）</li>
+  <li><strong>部署</strong>：Docker Compose 一键起服务，方便在云服务器上演示</li>
+</ul>
+<p>选 LangChain4j 而不是自己撸 HTTP 的原因很实在：它把 <code>@Tool</code> 注解、消息历史、结构化输出这些都封装好了，我可以把时间花在业务逻辑和工程化上，而不是 JSON 解析上。</p>
+
+<h2>Agent 运行循环</h2>
+<p>核心就是三步：<strong>Think → Act → Observe</strong></p>
+<ol>
+  <li>用户提出一个自然语言请求</li>
+  <li>Agent 思考要达成目标需要调用哪个工具</li>
+  <li>框架把这次决策翻译成对应工具的 API 调用</li>
+  <li>工具执行完毕，返回结果作为观测值</li>
+  <li>模型基于观测继续推理，循环直到能给出最终答案</li>
+</ol>
+<blockquote>这个循环是 Agent 和普通「大模型接口封装」的分水岭：调用几次工具、按什么顺序调，是模型自己决定的，不是我在代码里写死的 if-else。</blockquote>
+
+<h2>自研 5 个 @Tool 工具</h2>
+<ul>
+  <li><code>query_database</code>：执行只读 SQL 查询，SQL 由模型生成、由白名单校验</li>
+  <li><code>analyze_data</code>：对查询结果做聚合、排序、同比环比等统计分析</li>
+  <li><code>generate_report</code>：把分析结论输出成 Markdown 报告</li>
+  <li><code>search_knowledge</code>：检索本地知识库文档，为回答提供依据</li>
+  <li><code>schedule_task</code>：创建定时任务，支持周期性生成报告</li>
+</ul>
+<p>每个工具都用 <code>@Tool</code> 注解声明名称和描述，参数用 <code>@P</code> 标注。<strong>描述写得好不好，直接决定模型会不会在正确的时机选它</strong>——这部分调优花的时间不比写代码少。</p>
+
+<h2>工程化落地：区别于贴皮的关键</h2>
+<ul>
+  <li><strong>超时控制</strong>：<code>CompletableFuture</code> 给每次工具调用设 30 秒超时，避免一个慢查询把整个会话拖死</li>
+  <li><strong>失败重试</strong>：指数退避，最多重试 3 次；区分「可重试异常」（网络抖动）和「不可重试异常」（参数非法）</li>
+  <li><strong>Redis 限流</strong>：滑动窗口限制单用户每分钟调用次数，防止刷爆第三方 API 配额</li>
+  <li><strong>Token 计费</strong>：记录每次调用的 prompt / completion token 数，落库统计成本</li>
+  <li><strong>JUnit 测试</strong>：工具层用 mock 模型做单元测试，保证不烧钱也能跑 CI</li>
+</ul>
+
+<p><strong>面试官问「你这算不算 AI 套壳」的时候，你能把上面五条一条条答出来，这题就过了。</strong></p>
+
+      <div style="text-align:center">
+        <a href="../index.html#blog" class="back-link">← Back to Blog</a>
+      </div>]]></content:encoded>
+  </item>
+  <item>
+    <title>2026 就业市场真相：Java 没死，但 CRUD 的窗口已经关闭</title>
+    <link>https://shinchan-m.github.io/posts/job-market-2026-truth.html</link>
+    <guid isPermaLink="true">https://shinchan-m.github.io/posts/job-market-2026-truth.html</guid>
+    <pubDate>Wed, 24 Jun 2026 00:00:00 GMT</pubDate>
+    <description>全国 Java 岗位 42000 个，但初级岗竞争比 1:35+。阿里系 Java 岗位中 80% 要求 AI 技能。用真实数据告诉大二生该怎么准备。</description>
+    <content:encoded><![CDATA[<h2>先说三句结论</h2>
+<p><strong>Java 没死，死的是「只会 Java 写 CRUD」的竞争力。</strong></p>
+<p>基础扎实 + 有 AI 工程能力的复合型人才，缺口还有 2-3 年的窗口期；而纯 CRUD 岗位正在被低代码和 AI 编码工具快速压缩。焦虑没有用，看清楚数据再决定怎么打才有用。</p>
+
+<h2>五组真实数据</h2>
+<table>
+<tr><th>指标</th><th>数据</th><th>趋势</th></tr>
+<tr><td>全国 Java 在招岗位</td><td>~42,000</td><td>同比 ↓8%</td></tr>
+<tr><td>应届生/实习岗位</td><td>~11,000</td><td>同比 ↓15%</td></tr>
+<tr><td>初级岗竞争比</td><td>1:35+</td><td>最惨烈的一档</td></tr>
+<tr><td>Java+AI 复合岗位</td><td>增长 12 倍</td><td>薪资溢价 30-50%</td></tr>
+<tr><td>阿里系 Java 岗要求 AI 技能</td><td>超 80%</td><td>去年不到 30%</td></tr>
+</table>
+<p>把这张表读一遍就会发现：<strong>总量在缩，结构在变</strong>。缩掉的是可替代性最强的那部分，涨起来的是没人会的那部分。对还没毕业的人来说，这反而是好消息——你还有时间去站到涨的那一边。</p>
+
+<h2>给大二学生的五条可执行建议</h2>
+<ol>
+  <li><strong>别去挤那 90% 的通用岗</strong>：拼「我会 Java」已经没有意义，要在某个细分方向上做出可被验证的深度，比如源码级理解或自研中间件。</li>
+  <li><strong>瞄准复合岗的那 3-5%</strong>：每 100 个岗位里有 3-5 个是 Java+AI，投的人却远少于 100+ 个通用岗的竞争者，命中率高一个数量级。</li>
+  <li><strong>用 211 + AI Agent 项目做敲门砖</strong>：学历过初筛，项目过复筛，两者齐备能把简历通过率从个位数拉到 8-10%。</li>
+  <li><strong>把博客当第二份简历</strong>：一篇讲清 HashMap 扩容位运算的源码笔记，比简历上一句「熟悉 JVM」有说服力得多。</li>
+  <li><strong>海投 + 分层推进</strong>：先在江浙沪练兵攒面试经验，再冲深圳北京，最后全国撒网，不要一开始就把子弹打在最难的目标上。</li>
+</ol>
+
+<h2>招聘需求变了什么</h2>
+<p>JD 里「Java 开发」后面开始跟上这些词：</p>
+<ul>
+  <li>AI 能力优先</li>
+  <li>Agent 开发经验</li>
+  <li>提示词工程</li>
+  <li>AI-Native 架构设计</li>
+</ul>
+<p><strong>这些词两年前一个都搜不到，现在出现在八成的岗位描述里。</strong>换句话说，市场已经把「要不要学 AI」这道选择题改成了「什么时候开始学」。</p>
+
+      <div style="text-align:center">
+        <a href="../index.html#blog" class="back-link">← Back to Blog</a>
+      </div>]]></content:encoded>
+  </item>
+  <item>
+    <title>Java 后端实习路线：从 0 到 Offer 的 14 周冲刺计划</title>
+    <link>https://shinchan-m.github.io/posts/java-roadmap-14-weeks.html</link>
+    <guid isPermaLink="true">https://shinchan-m.github.io/posts/java-roadmap-14-weeks.html</guid>
+    <pubDate>Tue, 23 Jun 2026 00:00:00 GMT</pubDate>
+    <description>江南大学 211 计算机大一升大二，目标 2027 年拿到第一份日常实习。详细拆解 14 周冲刺计划的每一天——从 Java 基础到 AI Agent 部署。</description>
+    <content:encoded><![CDATA[<p>暑假到了，大一刚结束的我决定：用 14 周时间，为自己打造一份有竞争力的 Java 后端简历。</p>
+<h2>为什么是 14 周？</h2>
+<p>6 月 23 日到 9 月 28 日，恰好是 14 周。江南大学的暑假就是这么长。如果每天投入 4 小时，14 周就是 <strong>392 小时</strong>——足够从入门到能面试的水平。</p>
+<h2>四维区分度策略</h2>
+<p>2026 年的 Java 初级岗竞争比已经达到 <strong>1:35+</strong>，光会写 CRUD 远远不够。我的策略是四个维度同时推进：</p>
+<ol>
+  <li><strong>源码级理解</strong>：HashMap 怎么扩容？Spring Bean 生命周期有几级缓存？不只是背八股，而是看源码。</li>
+  <li><strong>AI Agent 差异化</strong>：95% 的候选人简历上没有 AI 项目。我用 LangChain4j + DeepSeek 做一个真正的 Agent 系统。</li>
+  <li><strong>自研中间件</strong>：手写一个 ORM 框架和 RPC 框架，理解 MyBatis 和 Dubbo 的底层原理。</li>
+  <li><strong>开源贡献</strong>：把自研项目开源到 GitHub，参与社区讨论。</li>
+</ol>
+<h2>14 周拆解</h2>
+<p>前 4 周打基础：Java 核心 + MySQL + 网络 + Spring Boot 入门。</p>
+<p>中间 6 周深挖：Spring 源码 + JUC 并发 + JVM 调优 + 自研框架。</p>
+<p>最后 4 周冲刺：AI Agent 系统 + Docker 部署 + 系统设计 + 简历打磨。</p>
+<h2>每天作息</h2>
+<p>09:00-11:50 学习理论，13:30-16:20 敲代码，16:30-17:30 运动，22:30 睡觉。周日休息——<strong>可持续才是王道</strong>。</p>
+<p>这篇文章会持续更新，记录每一天的进度和踩坑。</p>
+      <div style="text-align:center">
+        <a href="../index.html#blog" class="back-link">← Back to Blog</a>
+      </div>]]></content:encoded>
+  </item>
+  </channel>
+</rss>

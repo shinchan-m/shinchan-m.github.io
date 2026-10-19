@@ -1,0 +1,22 @@
+{
+  "title": "樱花书店",
+  "brandMark": "桜",
+  "author": "MJC",
+  "blogUrl": "https://shinchan-m.github.io/",
+  "feedUrl": "https://shinchan-m.github.io/feed.xml",
+  "feedEndpoint": "../feed.xml",
+  "cacheMinutes": 15,
+  "faviconUrl": "https://shinchan-m.github.io/favicon.svg",
+  "uiAccent": "#E8709A",
+  "defaultHour": 18.8,
+  "defaultWeather": "rain",
+  "defaultClouds": 68,
+  "defaultBrightness": 1,
+  "musicPlaylists": [],
+  "defaultMusicPlaylist": "builtin",
+  "galleryUrl": "",
+  "galleryType": "smart-gallery",
+  "galleryAlbums": [],
+  "galleryMaxMB": 512,
+  "galleryImageMode": "hd"
+}
