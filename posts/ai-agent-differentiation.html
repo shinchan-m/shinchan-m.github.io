@@ -3,7 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Agent + Java???????????? | MJC no Gakushuu Note</title>
+<title>AI Agent + Java：大二生的差异化竞争策略 | MJC no Gakushuu Note</title>
+<meta name="description" content="95% 的候选人简历上没有 AI 项目。用 Spring Boot + LangChain4j + DeepSeek 打造一个真正的 Agent 系统——完整架构解析与工程化落地细节。">
+<!-- 首屏前定好主题，暗色模式下不会闪一下白 -->
+<script>(function(){try{var s=localStorage.getItem('mjc-theme');var d=s==='dark'||(s!=='light'&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.setAttribute('data-theme',d?'dark':'light')}catch(e){document.documentElement.setAttribute('data-theme','light')}})()</script>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%B8%3C/text%3E%3C/svg%3E">
+<meta name="theme-color" content="#FFF0F5">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="MJC no Gakushuu Note">
+<meta property="og:title" content="AI Agent + Java：大二生的差异化竞争策略">
+<meta property="og:description" content="Spring Boot + LangChain4j + DeepSeek 打造真正的 Agent 系统：技术选型、运行循环、5 个自研 @Tool、以及区别于「贴皮」的工程化细节。">
+<meta property="og:url" content="https://shinchan-m.github.io/posts/ai-agent-differentiation.html">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-06-25">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="AI Agent + Java：大二生的差异化竞争策略">
+<meta name="twitter:description" content="Think → Act → Observe 的完整落地：5 个 @Tool 工具、超时/重试/限流/计费/测试五道工程化关卡。">
 <link rel="stylesheet" href="../style.css">
 <style>
   .post-header { text-align:center; padding:80px 20px 30px; }
@@ -16,10 +31,13 @@
   .post-content ul, .post-content ol { margin:12px 0 20px 24px; }
   .post-content li { margin-bottom:8px; line-height:1.8; }
   .post-content code { background:rgba(255,158,197,0.12); padding:2px 8px; border-radius:4px; font-size:0.9em; font-family:"Cascadia Code","Fira Code",monospace; }
+  .post-content pre { background:#2d2438; color:#f5eef8; padding:16px 18px; border-radius:8px; overflow-x:auto; margin:16px 0; line-height:1.7; }
+  .post-content pre code { background:none; padding:0; color:inherit; font-size:0.9em; }
   .post-content table { width:100%; border-collapse:collapse; margin:20px 0; }
   .post-content th { background:linear-gradient(135deg,rgba(255,158,197,0.2),rgba(200,112,232,0.15)); padding:10px 12px; text-align:left; }
   .post-content td { padding:10px 12px; border-bottom:1px solid var(--card-border); }
   .post-content strong { color:var(--sakura-dark); }
+  .post-content blockquote { border-left:4px solid var(--sky); margin:16px 0; padding:8px 16px; color:var(--text-light); background:rgba(168,216,234,0.1); border-radius:0 8px 8px 0; }
   .back-link { display:inline-block; margin:40px 0; color:var(--sakura-dark); text-decoration:none; font-size:0.95em; }
   .back-link:hover { text-decoration:underline; }
   @media(max-width:768px){ .post-content { padding:16px; } .post-header h1 { font-size:1.4em; } }
@@ -29,7 +47,7 @@
 <canvas id="sakura-canvas"></canvas>
 <nav>
   <div class="nav-inner">
-    <span class="nav-logo">&#x1F338; MJC no Gakushuu Note</span>
+    <span class="nav-logo">🌸 MJC no Gakushuu Note</span>
     <div class="nav-links">
       <a href="../index.html">Home</a>
       <a href="../index.html#blog">Blog</a>
@@ -39,62 +57,66 @@
 <main>
   <article>
     <div class="post-header">
-      <h1>AI Agent + Java????????????</h1>
-      <div class="post-meta">&#x1F4C5; 2026-06-25 &nbsp;|&nbsp; <span class="tag t-java">AIAgent</span> <span class="tag t-java">LangChain4j</span> <span class="tag t-java">SpringBoot</span></div>
-      <p style="color:var(--text-light);max-width:600px;margin:12px auto;font-size:0.95em">95% ????????? AI ????? Spring Boot + LangChain4j + DeepSeek ??????? Agent ??????????????</p>
+      <h1>AI Agent + Java：大二生的差异化竞争策略</h1>
+      <div class="post-meta">📅 2026-06-25 &nbsp;|&nbsp; <span class="tag t-java">AI Agent</span> <span class="tag t-java">LangChain4j</span> <span class="tag t-java">Spring Boot</span></div>
+      <p style="color:var(--text-light);max-width:600px;margin:12px auto;font-size:0.95em">95% 的候选人简历上没有 AI 项目。用 Spring Boot + LangChain4j + DeepSeek 打造一个真正的 Agent 系统——完整架构解析。</p>
     </div>
     <div class="post-content card">
-      
-<h2>????? AI Agent ??????</h2>
-<p>2026 ????? Java ????? AI ???????? 30% ???? 80%?? 95% ??????????? AI ?????????????</p>
 
-<h2>????</h2>
+<h2>为什么选择 AI Agent 差异化路线</h2>
+<p>2026 年的就业市场上，Java 岗位对 AI 技能的要求已经从去年的不到 30% 涨到了 80%。但与此同时，<strong>95% 的应届生简历上没有任何一个像样的 AI 项目</strong>——需求在猛涨，供给还没跟上，这就是大二学生能钻进去的窗口期。</p>
+<p>要注意区分两件事：调一次大模型 API 做个聊天框，那叫「贴皮」；让模型自己决定调用哪个工具、拿到结果后继续推理，那才叫 Agent。面试官一眼就能看出差别，本文讲的是后者。</p>
+
+<h2>技术选型</h2>
 <ul>
-  <li><strong>????</strong>?Spring Boot 3.x</li>
-  <li><strong>AI ??</strong>?LangChain4j?Java ??? LangChain?</li>
-  <li><strong>LLM</strong>?DeepSeek API???????????</li>
-  <li><strong>???</strong>?MySQL + Redis</li>
-  <li><strong>??</strong>?Docker Compose ????</li>
+  <li><strong>后端框架</strong>：Spring Boot 3.x（JDK 17 起，虚拟线程可选）</li>
+  <li><strong>AI 编排</strong>：LangChain4j，Java 生态里的 LangChain 对应物</li>
+  <li><strong>LLM</strong>：DeepSeek API，国产、便宜，原生支持 Function Calling</li>
+  <li><strong>数据层</strong>：MySQL + Redis（业务数据 + 限流计数）</li>
+  <li><strong>部署</strong>：Docker Compose 一键起服务，方便在云服务器上演示</li>
 </ul>
+<p>选 LangChain4j 而不是自己撸 HTTP 的原因很实在：它把 <code>@Tool</code> 注解、消息历史、结构化输出这些都封装好了，我可以把时间花在业务逻辑和工程化上，而不是 JSON 解析上。</p>
 
-<h2>Agent ????</h2>
-<p>?????<strong>Think ? Act ? Observe</strong></p>
+<h2>Agent 运行循环</h2>
+<p>核心就是三步：<strong>Think → Act → Observe</strong></p>
 <ol>
-  <li>??????</li>
-  <li>Agent ?????????????</li>
-  <li>?????????????? API?</li>
-  <li>????????</li>
-  <li>????????????????????</li>
+  <li>用户提出一个自然语言请求</li>
+  <li>Agent 思考要达成目标需要调用哪个工具</li>
+  <li>框架把这次决策翻译成对应工具的 API 调用</li>
+  <li>工具执行完毕，返回结果作为观测值</li>
+  <li>模型基于观测继续推理，循环直到能给出最终答案</li>
 </ol>
+<blockquote>这个循环是 Agent 和普通「大模型接口封装」的分水岭：调用几次工具、按什么顺序调，是模型自己决定的，不是我在代码里写死的 if-else。</blockquote>
 
-<h2>?? 5 ? @Tool ??</h2>
+<h2>自研 5 个 @Tool 工具</h2>
 <ul>
-  <li>query_database?????? SQL ??</li>
-  <li>analyze_data???????</li>
-  <li>generate_report????? Markdown ??</li>
-  <li>search_knowledge????????</li>
-  <li>schedule_task???????</li>
+  <li><code>query_database</code>：执行只读 SQL 查询，SQL 由模型生成、由白名单校验</li>
+  <li><code>analyze_data</code>：对查询结果做聚合、排序、同比环比等统计分析</li>
+  <li><code>generate_report</code>：把分析结论输出成 Markdown 报告</li>
+  <li><code>search_knowledge</code>：检索本地知识库文档，为回答提供依据</li>
+  <li><code>schedule_task</code>：创建定时任务，支持周期性生成报告</li>
+</ul>
+<p>每个工具都用 <code>@Tool</code> 注解声明名称和描述，参数用 <code>@P</code> 标注。<strong>描述写得好不好，直接决定模型会不会在正确的时机选它</strong>——这部分调优花的时间不比写代码少。</p>
+
+<h2>工程化落地：区别于贴皮的关键</h2>
+<ul>
+  <li><strong>超时控制</strong>：<code>CompletableFuture</code> 给每次工具调用设 30 秒超时，避免一个慢查询把整个会话拖死</li>
+  <li><strong>失败重试</strong>：指数退避，最多重试 3 次；区分「可重试异常」（网络抖动）和「不可重试异常」（参数非法）</li>
+  <li><strong>Redis 限流</strong>：滑动窗口限制单用户每分钟调用次数，防止刷爆第三方 API 配额</li>
+  <li><strong>Token 计费</strong>：记录每次调用的 prompt / completion token 数，落库统计成本</li>
+  <li><strong>JUnit 测试</strong>：工具层用 mock 模型做单元测试，保证不烧钱也能跑 CI</li>
 </ul>
 
-<h2>?????????????</h2>
-<ul>
-  <li><strong>????</strong>?CompleteableFuture ?? 30 ???</li>
-  <li><strong>????</strong>??????????? 3 ?</li>
-  <li><strong>Redis ??</strong>??? API ????</li>
-  <li><strong>Token ??</strong>?????? Token ????</li>
-  <li><strong>JUnit ??</strong>????????</li>
-</ul>
-
-<p><strong>????"?? AI ???????"???????????</strong></p>
+<p><strong>面试官问「你这算不算 AI 套壳」的时候，你能把上面五条一条条答出来，这题就过了。</strong></p>
 
       <div style="text-align:center">
-        <a href="../index.html#blog" class="back-link">&#x2190; Back to Blog</a>
+        <a href="../index.html#blog" class="back-link">← Back to Blog</a>
       </div>
     </div>
   </article>
 </main>
 <footer>
-  <p>&#x1F338; <a href="https://mjc-0910.github.io">shinchan-m.github.io</a> &#xB7; Jiangnan University 2025</p>
+  <p>🌸 <a href="https://shinchan-m.github.io">shinchan-m.github.io</a> · 江南大学 2025 · Java Backend</p>
 </footer>
 <script src="../app.js"></script>
 </body>

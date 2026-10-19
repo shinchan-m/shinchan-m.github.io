@@ -1,17 +1,51 @@
+/* ============================================================
+   🌸 MJC no Gakushuu Note — 设计变量
+   亮色为默认，[data-theme="dark"] 覆盖为暗色。
+   主题由 <head> 里的内联脚本在首屏前决定（避免闪白），
+   app.js 的切换按钮负责运行时改写 data-theme。
+   ============================================================ */
+
 :root {
+  color-scheme: light;
+
+  /* 主色 */
   --sakura: #FF9EC5;
   --sakura-dark: #E8709A;
+  --sakura-deep: #C94F7C;
   --sky: #A8D8EA;
   --sky-light: #D4EEF7;
   --cream: #FFF8F0;
   --gold: #E8C170;
+  --violet: #C870E8;
+
+  /* 文字 */
   --text: #4A3B4A;
   --text-light: #7A6B7A;
-  --card: rgba(255,255,255,0.85);
-  --card-border: rgba(255,158,197,0.3);
-  --shadow: 0 4px 20px rgba(255,158,197,0.15);
-  --shadow-hover: 0 8px 32px rgba(255,158,197,0.25);
-  --nav-bg: rgba(255,248,240,0.92);
+
+  /* 表面 */
+  --card: rgba(255, 255, 255, 0.85);
+  --card-solid: #FFFFFF;
+  --card-border: rgba(255, 158, 197, 0.3);
+  --track: #F0E8F0;
+  --code-bg: #2D2438;
+  --code-text: #F5EEF8;
+
+  /* 阴影 */
+  --shadow: 0 4px 20px rgba(255, 158, 197, 0.15);
+  --shadow-hover: 0 8px 32px rgba(255, 158, 197, 0.25);
+
+  /* 导航 */
+  --nav-bg: rgba(255, 248, 240, 0.92);
+
+  /* 页面底色（body 渐变用） */
+  --bg-1: #FFF0F5;
+  --bg-2: #F0F4FF;
+  --bg-3: #FFF5F0;
+  --glow-1: rgba(255, 158, 197, 0.08);
+  --glow-2: rgba(168, 216, 234, 0.08);
+  --glow-3: rgba(232, 193, 112, 0.06);
+
+  /* 标签色 */
   --tag-java: #E8709A;
   --tag-spring: #6DBF6D;
   --tag-redis: #E87070;
@@ -19,5 +53,57 @@
   --tag-docker: #4DA6D9;
   --tag-go: #6DD5D8;
   --tag-mysql: #E8964A;
-  --tag-linux: #555;
+  --tag-linux: #555555;
+
+  /* 特效 */
+  --fx-z: 9999;
+}
+
+/* ============================================================
+   暗色主题 —— 夜色下的樱花
+   不是简单反色：降低背景亮度、抬高主色明度以维持对比度，
+   卡片改用半透明深紫，阴影换成实黑 + 樱花辉光。
+   ============================================================ */
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --sakura: #FFB3D1;
+  --sakura-dark: #FF8FB8;
+  --sakura-deep: #FF6FA5;
+  --sky: #86C5E0;
+  --sky-light: #2A3B4A;
+  --cream: #1A1520;
+  --gold: #E3C079;
+  --violet: #D98CFF;
+
+  --text: #F0E7F2;
+  --text-light: #AC9CB4;
+
+  --card: rgba(40, 32, 50, 0.78);
+  --card-solid: #241D2E;
+  --card-border: rgba(255, 158, 197, 0.2);
+  --track: #2E2539;
+  --code-bg: #1A1422;
+  --code-text: #EFE4F5;
+
+  --shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
+  --shadow-hover: 0 8px 32px rgba(255, 143, 184, 0.16);
+
+  --nav-bg: rgba(24, 19, 30, 0.88);
+
+  --bg-1: #17111D;
+  --bg-2: #121824;
+  --bg-3: #1C1520;
+  --glow-1: rgba(255, 143, 184, 0.09);
+  --glow-2: rgba(110, 170, 210, 0.07);
+  --glow-3: rgba(217, 140, 255, 0.05);
+
+  --tag-java: #FF8FB8;
+  --tag-spring: #7FD47F;
+  --tag-redis: #FF9090;
+  --tag-ai: #B79CFF;
+  --tag-docker: #6FC4EC;
+  --tag-go: #85E4E7;
+  --tag-mysql: #F5AE63;
+  --tag-linux: #B4A8BC;
 }

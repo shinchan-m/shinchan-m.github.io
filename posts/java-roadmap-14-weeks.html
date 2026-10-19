@@ -4,6 +4,21 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Java 后端实习路线：从 0 到 Offer 的 14 周冲刺计划 | MJC no Gakushuu Note</title>
+<meta name="description" content="江南大学 211 计算机大一升大二，目标 2027 年拿到第一份日常实习。详细拆解 14 周冲刺计划的每一天——从 Java 基础到 AI Agent 部署。">
+<!-- 首屏前定好主题，暗色模式下不会闪一下白 -->
+<script>(function(){try{var s=localStorage.getItem('mjc-theme');var d=s==='dark'||(s!=='light'&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.setAttribute('data-theme',d?'dark':'light')}catch(e){document.documentElement.setAttribute('data-theme','light')}})()</script>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%B8%3C/text%3E%3C/svg%3E">
+<meta name="theme-color" content="#FFF0F5">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="MJC no Gakushuu Note">
+<meta property="og:title" content="Java 后端实习路线：从 0 到 Offer 的 14 周冲刺计划">
+<meta property="og:description" content="江南大学 211 计算机大一升大二，目标 2027 年拿到第一份日常实习。详细拆解 14 周冲刺计划的每一天——从 Java 基础到 AI Agent 部署。">
+<meta property="og:url" content="https://shinchan-m.github.io/posts/java-roadmap-14-weeks.html">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-06-23">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java 后端实习路线：从 0 到 Offer 的 14 周冲刺计划">
+<meta name="twitter:description" content="14 周逐周拆解：Java 核心 → Spring → MySQL/Redis → 源码 → AI Agent → Docker 部署 → 简历。">
 <link rel="stylesheet" href="../style.css">
 <style>
   .post-header { text-align:center; padding:80px 20px 30px; }
@@ -16,10 +31,13 @@
   .post-content ul, .post-content ol { margin:12px 0 20px 24px; }
   .post-content li { margin-bottom:8px; line-height:1.8; }
   .post-content code { background:rgba(255,158,197,0.12); padding:2px 8px; border-radius:4px; font-size:0.9em; font-family:"Cascadia Code","Fira Code",monospace; }
+  .post-content pre { background:#2d2438; color:#f5eef8; padding:16px 18px; border-radius:8px; overflow-x:auto; margin:16px 0; line-height:1.7; }
+  .post-content pre code { background:none; padding:0; color:inherit; font-size:0.9em; }
   .post-content table { width:100%; border-collapse:collapse; margin:20px 0; }
   .post-content th { background:linear-gradient(135deg,rgba(255,158,197,0.2),rgba(200,112,232,0.15)); padding:10px 12px; text-align:left; }
   .post-content td { padding:10px 12px; border-bottom:1px solid var(--card-border); }
   .post-content strong { color:var(--sakura-dark); }
+  .post-content blockquote { border-left:4px solid var(--sky); margin:16px 0; padding:8px 16px; color:var(--text-light); background:rgba(168,216,234,0.1); border-radius:0 8px 8px 0; }
   .back-link { display:inline-block; margin:40px 0; color:var(--sakura-dark); text-decoration:none; font-size:0.95em; }
   .back-link:hover { text-decoration:underline; }
   @media(max-width:768px){ .post-content { padding:16px; } .post-header h1 { font-size:1.4em; } }
@@ -69,7 +87,7 @@
   </article>
 </main>
 <footer>
-  <p>🌸 <a href="https://mjc-0910.github.io">shinchan-m.github.io</a> · Jiangnan University 2025</p>
+  <p>🌸 <a href="https://shinchan-m.github.io">shinchan-m.github.io</a> · 江南大学 2025 · Java Backend</p>
 </footer>
 <script src="../app.js"></script>
 </body>

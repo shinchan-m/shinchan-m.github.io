@@ -3,7 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>2026 ???????Java ???? CRUD ??????? | MJC no Gakushuu Note</title>
+<title>2026 就业市场真相：Java 没死，但 CRUD 的窗口已经关闭 | MJC no Gakushuu Note</title>
+<meta name="description" content="全国 Java 岗位 42000 个，但初级岗竞争比 1:35+。阿里系 Java 岗位中 80% 要求 AI 技能。用真实数据告诉大二生该怎么准备。">
+<!-- 首屏前定好主题，暗色模式下不会闪一下白 -->
+<script>(function(){try{var s=localStorage.getItem('mjc-theme');var d=s==='dark'||(s!=='light'&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.setAttribute('data-theme',d?'dark':'light')}catch(e){document.documentElement.setAttribute('data-theme','light')}})()</script>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%B8%3C/text%3E%3C/svg%3E">
+<meta name="theme-color" content="#FFF0F5">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="MJC no Gakushuu Note">
+<meta property="og:title" content="2026 就业市场真相：Java 没死，但 CRUD 的窗口已经关闭">
+<meta property="og:description" content="全国 Java 在招岗位约 42000 个、初级岗竞争比 1:35+、Java+AI 复合岗薪资溢价 30-50%。数据摆出来，再讲大二学生该怎么打。">
+<meta property="og:url" content="https://shinchan-m.github.io/posts/job-market-2026-truth.html">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-06-24">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="2026 就业市场真相：Java 没死，但 CRUD 的窗口已经关闭">
+<meta name="twitter:description" content="42000 个岗位、1:35+ 的竞争比、80% 要求 AI 技能——五条给大二学生的可执行建议。">
 <link rel="stylesheet" href="../style.css">
 <style>
   .post-header { text-align:center; padding:80px 20px 30px; }
@@ -16,10 +31,13 @@
   .post-content ul, .post-content ol { margin:12px 0 20px 24px; }
   .post-content li { margin-bottom:8px; line-height:1.8; }
   .post-content code { background:rgba(255,158,197,0.12); padding:2px 8px; border-radius:4px; font-size:0.9em; font-family:"Cascadia Code","Fira Code",monospace; }
+  .post-content pre { background:#2d2438; color:#f5eef8; padding:16px 18px; border-radius:8px; overflow-x:auto; margin:16px 0; line-height:1.7; }
+  .post-content pre code { background:none; padding:0; color:inherit; font-size:0.9em; }
   .post-content table { width:100%; border-collapse:collapse; margin:20px 0; }
   .post-content th { background:linear-gradient(135deg,rgba(255,158,197,0.2),rgba(200,112,232,0.15)); padding:10px 12px; text-align:left; }
   .post-content td { padding:10px 12px; border-bottom:1px solid var(--card-border); }
   .post-content strong { color:var(--sakura-dark); }
+  .post-content blockquote { border-left:4px solid var(--sky); margin:16px 0; padding:8px 16px; color:var(--text-light); background:rgba(168,216,234,0.1); border-radius:0 8px 8px 0; }
   .back-link { display:inline-block; margin:40px 0; color:var(--sakura-dark); text-decoration:none; font-size:0.95em; }
   .back-link:hover { text-decoration:underline; }
   @media(max-width:768px){ .post-content { padding:16px; } .post-header h1 { font-size:1.4em; } }
@@ -29,7 +47,7 @@
 <canvas id="sakura-canvas"></canvas>
 <nav>
   <div class="nav-inner">
-    <span class="nav-logo">&#x1F338; MJC no Gakushuu Note</span>
+    <span class="nav-logo">🌸 MJC no Gakushuu Note</span>
     <div class="nav-links">
       <a href="../index.html">Home</a>
       <a href="../index.html#blog">Blog</a>
@@ -39,53 +57,54 @@
 <main>
   <article>
     <div class="post-header">
-      <h1>2026 ???????Java ???? CRUD ???????</h1>
-      <div class="post-meta">&#x1F4C5; 2026-06-24 &nbsp;|&nbsp; <span class="tag t-java">JobMarket</span> <span class="tag t-java">Career</span> <span class="tag t-java">Analysis</span></div>
-      <p style="color:var(--text-light);max-width:600px;margin:12px auto;font-size:0.95em">?? Java ?? 42000 ????????? 1:35+???? Java ??? 80% ?? AI ?????????????????????????</p>
+      <h1>2026 就业市场真相：Java 没死，但 CRUD 的窗口已经关闭</h1>
+      <div class="post-meta">📅 2026-06-24 &nbsp;|&nbsp; <span class="tag t-java">就业市场</span> <span class="tag t-java">职业规划</span> <span class="tag t-java">数据分析</span></div>
+      <p style="color:var(--text-light);max-width:600px;margin:12px auto;font-size:0.95em">全国 Java 岗位 42000 个，但初级岗竞争比 1:35+。阿里系 Java 岗位中 80% 要求 AI 技能。用真实数据告诉大二生该怎么准备。</p>
     </div>
     <div class="post-content card">
-      
-<h2>??????</h2>
-<p><strong>Java ????"?? Java ? CRUD"????????</strong></p>
-<p>?????? + AI ?????? 2-3 ???????????? CRUD ????????</p>
 
-<h2>??????</h2>
+<h2>先说三句结论</h2>
+<p><strong>Java 没死，死的是「只会 Java 写 CRUD」的竞争力。</strong></p>
+<p>基础扎实 + 有 AI 工程能力的复合型人才，缺口还有 2-3 年的窗口期；而纯 CRUD 岗位正在被低代码和 AI 编码工具快速压缩。焦虑没有用，看清楚数据再决定怎么打才有用。</p>
+
+<h2>五组真实数据</h2>
 <table>
-<tr><th>??</th><th>??</th><th>??</th></tr>
-<tr><td>?? Java ????</td><td>~42,000</td><td>?? 8%</td></tr>
-<tr><td>???/????</td><td>~11,000</td><td>?? 15%</td></tr>
-<tr><td>??????</td><td>1:35+</td><td>???</td></tr>
-<tr><td>Java+AI ????</td><td>?? 12 ?</td><td>???? 30-50%</td></tr>
-<tr><td>?? Java ??? AI ??</td><td>? 80%</td><td>???? 30%</td></tr>
+<tr><th>指标</th><th>数据</th><th>趋势</th></tr>
+<tr><td>全国 Java 在招岗位</td><td>~42,000</td><td>同比 ↓8%</td></tr>
+<tr><td>应届生/实习岗位</td><td>~11,000</td><td>同比 ↓15%</td></tr>
+<tr><td>初级岗竞争比</td><td>1:35+</td><td>最惨烈的一档</td></tr>
+<tr><td>Java+AI 复合岗位</td><td>增长 12 倍</td><td>薪资溢价 30-50%</td></tr>
+<tr><td>阿里系 Java 岗要求 AI 技能</td><td>超 80%</td><td>去年不到 30%</td></tr>
 </table>
+<p>把这张表读一遍就会发现：<strong>总量在缩，结构在变</strong>。缩掉的是可替代性最强的那部分，涨起来的是没人会的那部分。对还没毕业的人来说，这反而是好消息——你还有时间去站到涨的那一边。</p>
 
-<h2>?????????????</h2>
+<h2>给大二学生的五条可执行建议</h2>
 <ol>
-  <li><strong>?????? 90% ????</strong>??????"????"????????????????</li>
-  <li><strong>????? 3-5%</strong>?? 100 ????? 3-5 ??????? 100+ ?????</li>
-  <li><strong>? 211 + AI Agent ???????</strong>?????????????? 8-10%?</li>
-  <li><strong>??????????</strong>????????????????</li>
-  <li><strong>????????</strong>?????????????????</li>
+  <li><strong>别去挤那 90% 的通用岗</strong>：拼「我会 Java」已经没有意义，要在某个细分方向上做出可被验证的深度，比如源码级理解或自研中间件。</li>
+  <li><strong>瞄准复合岗的那 3-5%</strong>：每 100 个岗位里有 3-5 个是 Java+AI，投的人却远少于 100+ 个通用岗的竞争者，命中率高一个数量级。</li>
+  <li><strong>用 211 + AI Agent 项目做敲门砖</strong>：学历过初筛，项目过复筛，两者齐备能把简历通过率从个位数拉到 8-10%。</li>
+  <li><strong>把博客当第二份简历</strong>：一篇讲清 HashMap 扩容位运算的源码笔记，比简历上一句「熟悉 JVM」有说服力得多。</li>
+  <li><strong>海投 + 分层推进</strong>：先在江浙沪练兵攒面试经验，再冲深圳北京，最后全国撒网，不要一开始就把子弹打在最难的目标上。</li>
 </ol>
 
-<h2>????????</h2>
-<p>JD ?"Java ????"????</p>
+<h2>招聘需求变了什么</h2>
+<p>JD 里「Java 开发」后面开始跟上这些词：</p>
 <ul>
-  <li>AI ???????</li>
-  <li>Agent ?????</li>
-  <li>??????</li>
-  <li>AI-Native ????</li>
+  <li>AI 能力优先</li>
+  <li>Agent 开发经验</li>
+  <li>提示词工程</li>
+  <li>AI-Native 架构设计</li>
 </ul>
-<p><strong>?????????????????</strong></p>
+<p><strong>这些词两年前一个都搜不到，现在出现在八成的岗位描述里。</strong>换句话说，市场已经把「要不要学 AI」这道选择题改成了「什么时候开始学」。</p>
 
       <div style="text-align:center">
-        <a href="../index.html#blog" class="back-link">&#x2190; Back to Blog</a>
+        <a href="../index.html#blog" class="back-link">← Back to Blog</a>
       </div>
     </div>
   </article>
 </main>
 <footer>
-  <p>&#x1F338; <a href="https://mjc-0910.github.io">shinchan-m.github.io</a> &#xB7; Jiangnan University 2025</p>
+  <p>🌸 <a href="https://shinchan-m.github.io">shinchan-m.github.io</a> · 江南大学 2025 · Java Backend</p>
 </footer>
 <script src="../app.js"></script>
 </body>

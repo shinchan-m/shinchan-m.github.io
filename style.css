@@ -1,16 +1,28 @@
-/* ===== ??????? - MJC Learning Note ===== */
+/* ===== 🌸 MJC no Gakushuu Note — Anime Sakura Theme ===== */
 @import url("./vars.css");
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
+html {
+  /* 锚点跳转留出固定导航的高度 */
+  scroll-padding-top: 76px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
+
 body {
   font-family: "Segoe UI", "Microsoft YaHei", "PingFang SC", sans-serif;
-  background: linear-gradient(135deg, #FFF0F5 0%, #F0F4FF 30%, #FFF5F0 60%, #FFF0F5 100%);
+  background: linear-gradient(135deg,
+    var(--bg-1) 0%, var(--bg-2) 30%, var(--bg-3) 60%, var(--bg-1) 100%);
   background-attachment: fixed;
   color: var(--text);
   line-height: 1.8;
   overflow-x: hidden;
   position: relative;
+  /* 主题切换时颜色平滑过渡，不硬跳 */
+  transition: background-color 0.35s ease, color 0.35s ease;
 }
 
 body::before {
@@ -19,11 +31,24 @@ body::before {
   top: -50%; left: -50%;
   width: 200%; height: 200%;
   background:
-    radial-gradient(ellipse at 20% 50%, rgba(255,158,197,0.08) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 20%, rgba(168,216,234,0.08) 0%, transparent 50%),
-    radial-gradient(ellipse at 50% 80%, rgba(232,193,112,0.06) 0%, transparent 50%);
+    radial-gradient(ellipse at 20% 50%, var(--glow-1) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, var(--glow-2) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 80%, var(--glow-3) 0%, transparent 50%);
   pointer-events: none;
   z-index: 0;
+}
+
+/* 键盘可达性：只有键盘操作时才显示焦点环 */
+:focus-visible {
+  outline: 2px solid var(--sakura-dark);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* 选中文字也保持樱花感 */
+::selection {
+  background: rgba(255, 158, 197, 0.35);
+  color: var(--text);
 }
 
 #sakura-canvas {
@@ -209,7 +234,7 @@ h2 { font-size: 1.6em; margin-bottom: 20px; display: flex; align-items: center; 
 .skill-name { font-weight: 700; font-size: 1.05em; margin-bottom: 8px; }
 .skill-desc { font-size: 0.82em; color: var(--text-light); }
 
-.progress-bar { margin-top: 10px; height: 6px; background: #F0E8F0; border-radius: 3px; overflow: hidden; }
+.progress-bar { margin-top: 10px; height: 6px; background: var(--track); border-radius: 3px; overflow: hidden; }
 .progress-fill {
   height: 100%; border-radius: 3px;
   background: linear-gradient(90deg, var(--sakura), var(--sakura-dark));
@@ -384,4 +409,270 @@ footer a { color: var(--sakura-dark); text-decoration: none; }
   .timeline { padding-left: 28px; }
   .roadmap-flow { flex-direction: column; }
   .flow-arrow { transform: rotate(90deg); }
+  .to-top { right: 14px; bottom: 14px; width: 44px; height: 44px; }
+  .binft { font-size: 0.85em; }
+}
+
+/* ============================================================
+   🌸 以下为美化新增部分（2026-10 改造）
+   樱花滚动条 / 点击特效 / 打字机 / 主题切换 / 回到顶部 /
+   阅读进度 / 代码复制 / 卡片倾斜
+   ============================================================ */
+
+/* --- 樱花滚动条 --- */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--sakura), var(--violet));
+  border-radius: 6px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, var(--sakura-dark), var(--violet));
+  background-clip: padding-box;
+}
+html { scrollbar-color: var(--sakura) transparent; scrollbar-width: thin; }
+
+/* --- 点击特效层（爱心 / 花瓣 / 烟花都在这一层） --- */
+#fx-canvas {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: var(--fx-z);
+}
+
+.fx-heart {
+  position: fixed;
+  z-index: var(--fx-z);
+  pointer-events: none;
+  width: 12px; height: 12px;
+  margin: -6px 0 0 -6px;
+  background: var(--c, #FF9EC5);
+  transform: rotate(-45deg);
+  animation: fxHeartFly 900ms cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+  will-change: transform, opacity;
+}
+.fx-heart::before,
+.fx-heart::after {
+  content: "";
+  position: absolute;
+  width: inherit; height: inherit;
+  background: inherit;
+  border-radius: 50%;
+}
+.fx-heart::before { top: -50%; left: 0; }
+.fx-heart::after  { top: 0; left: 50%; }
+
+@keyframes fxHeartFly {
+  0%   { opacity: 0; transform: translate(0, 0) rotate(-45deg) scale(0.3); }
+  15%  { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--dx), var(--dy)) rotate(-45deg) scale(1.15); }
+}
+
+.fx-emoji {
+  position: fixed;
+  z-index: var(--fx-z);
+  pointer-events: none;
+  font-size: 16px;
+  line-height: 1;
+  margin: -8px 0 0 -8px;
+  animation: fxEmojiFly 1100ms cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+  will-change: transform, opacity;
+}
+
+@keyframes fxEmojiFly {
+  0%   { opacity: 0; transform: translate(0, 0) rotate(0deg) scale(0.5); }
+  12%  { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--dx), var(--dy)) rotate(var(--rot)) scale(1); }
+}
+
+/* --- Hero 打字机 --- */
+.hero-binft {
+  margin-top: 16px;
+  min-height: 1.9em;
+  font-family: "Cascadia Code", "Fira Code", "Consolas", monospace;
+  font-size: 0.95em;
+  color: var(--text-light);
+  letter-spacing: 0.02em;
+}
+.binft {
+  display: inline-block;
+  min-height: 1.6em;
+  vertical-align: bottom;
+}
+.binft .binft-tail {
+  font-weight: 700;
+  animation: binftBlink 0.9s steps(2, start) infinite;
+}
+@keyframes binftBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0.15; } }
+
+/* --- 主题切换按钮（JS 注入到 .nav-links 末尾） --- */
+.theme-toggle {
+  background: none;
+  border: 1.5px solid var(--card-border);
+  color: var(--text-light);
+  width: 32px; height: 32px;
+  padding: 0;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 0.95em;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+.theme-toggle:hover {
+  border-color: var(--sakura);
+  background: rgba(255, 158, 197, 0.12);
+  transform: rotate(20deg) scale(1.1);
+}
+
+/* --- 回到顶部（外圈是阅读进度环） --- */
+.to-top {
+  position: fixed;
+  right: 22px; bottom: 22px;
+  width: 52px; height: 52px;
+  z-index: 900;
+  border: none;
+  padding: 0;
+  background: var(--card);
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow);
+  opacity: 0;
+  transform: translateY(16px) scale(0.85);
+  pointer-events: none;
+  transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+              box-shadow 0.3s ease;
+}
+.to-top.show {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+.to-top:hover {
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-3px) scale(1.06);
+}
+.to-top svg {
+  position: absolute;
+  inset: 0;
+  width: 100%; height: 100%;
+  transform: rotate(-90deg);
+}
+.to-top .ring-bg {
+  fill: none;
+  stroke: var(--track);
+  stroke-width: 3;
+}
+.to-top .ring-fg {
+  fill: none;
+  stroke: url(#toTopGrad);
+  stroke-width: 3;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.12s linear;
+}
+.to-top .to-top-icon {
+  position: relative;
+  font-size: 1.15em;
+  line-height: 1;
+}
+
+/* --- 文章页顶部阅读进度条 --- */
+#read-bar {
+  position: fixed;
+  top: 0; left: 0;
+  height: 3px;
+  width: 100%;
+  z-index: 101;
+  pointer-events: none;
+  background: transparent;
+}
+#read-bar i {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, var(--sakura), var(--violet), var(--sky));
+  box-shadow: 0 0 8px rgba(255, 158, 197, 0.6);
+  transition: width 0.1s linear;
+}
+
+/* --- 代码块 + 一键复制 --- */
+.code-wrap {
+  position: relative;
+  margin: 16px 0;
+}
+.code-wrap > pre { margin: 0; }
+.code-copy {
+  position: absolute;
+  top: 8px; right: 8px;
+  z-index: 3;
+  border: 1px solid rgba(255, 158, 197, 0.4);
+  background: rgba(45, 36, 56, 0.75);
+  color: #FFD9E8;
+  font-size: 0.72em;
+  padding: 3px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.25s ease, background 0.25s ease, transform 0.25s ease;
+  backdrop-filter: blur(6px);
+}
+.code-wrap:hover .code-copy,
+.code-copy:focus-visible { opacity: 1; }
+.code-copy:hover { background: var(--sakura-dark); color: #fff; transform: translateY(-1px); }
+.code-copy.done { background: var(--tag-spring); border-color: var(--tag-spring); color: #fff; opacity: 1; }
+
+/* --- 卡片 3D 倾斜 --- */
+.tilt-on {
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* --- 暗色模式下需要单独盖掉的硬编码颜色 --- */
+[data-theme="dark"] .post-content pre {
+  background: var(--code-bg);
+  color: var(--code-text);
+  border: 1px solid rgba(255, 158, 197, 0.14);
+}
+[data-theme="dark"] .post-content code {
+  background: rgba(255, 143, 184, 0.18);
+  color: #FFD3E4;
+}
+[data-theme="dark"] .post-content pre code {
+  background: none;
+  color: inherit;
+}
+[data-theme="dark"] .post-content blockquote {
+  background: rgba(134, 197, 224, 0.1);
+}
+[data-theme="dark"] .code-copy {
+  background: rgba(26, 20, 34, 0.85);
+}
+[data-theme="dark"] th {
+  background: linear-gradient(135deg, rgba(255, 143, 184, 0.22), rgba(217, 140, 255, 0.16));
+}
+[data-theme="dark"] .nav-logo {
+  background: linear-gradient(135deg, var(--sakura), var(--violet));
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+/* --- 尊重系统「减少动态效果」设置 --- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .animate-in { opacity: 1; transform: none; }
+  .float-deco { animation: none; }
+  #sakura-canvas, #fx-canvas { display: none; }
 }

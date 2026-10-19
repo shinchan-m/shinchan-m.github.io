@@ -3,7 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HashMap ???????? put ? resize | MJC no Gakushuu Note</title>
+<title>HashMap 源码深度解析：从 put 到 resize | MJC no Gakushuu Note</title>
+<meta name="description" content="面试必考题！逐行分析 HashMap 的 put 方法、哈希冲突解决、红黑树转换和扩容机制——不只是背八股，而是真正看懂源码。">
+<!-- 首屏前定好主题，暗色模式下不会闪一下白 -->
+<script>(function(){try{var s=localStorage.getItem('mjc-theme');var d=s==='dark'||(s!=='light'&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.setAttribute('data-theme',d?'dark':'light')}catch(e){document.documentElement.setAttribute('data-theme','light')}})()</script>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%B8%3C/text%3E%3C/svg%3E">
+<meta name="theme-color" content="#FFF0F5">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="MJC no Gakushuu Note">
+<meta property="og:title" content="HashMap 源码深度解析：从 put 到 resize">
+<meta property="og:description" content="扰动函数为什么右移 16 位、(n-1)&amp;hash 为什么能代替取模、链表什么时候转红黑树、JDK 1.8 扩容为什么不用重算 hash——逐行讲清。">
+<meta property="og:url" content="https://shinchan-m.github.io/posts/hashmap-source-analysis.html">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-07-01">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="HashMap 源码深度解析：从 put 到 resize">
+<meta name="twitter:description" content="数组 + 链表 + 红黑树、put 七步流程、resize 的高位判断技巧，以及四个高频追问。">
 <link rel="stylesheet" href="../style.css">
 <style>
   .post-header { text-align:center; padding:80px 20px 30px; }
@@ -16,10 +31,13 @@
   .post-content ul, .post-content ol { margin:12px 0 20px 24px; }
   .post-content li { margin-bottom:8px; line-height:1.8; }
   .post-content code { background:rgba(255,158,197,0.12); padding:2px 8px; border-radius:4px; font-size:0.9em; font-family:"Cascadia Code","Fira Code",monospace; }
+  .post-content pre { background:#2d2438; color:#f5eef8; padding:16px 18px; border-radius:8px; overflow-x:auto; margin:16px 0; line-height:1.7; }
+  .post-content pre code { background:none; padding:0; color:inherit; font-size:0.9em; }
   .post-content table { width:100%; border-collapse:collapse; margin:20px 0; }
   .post-content th { background:linear-gradient(135deg,rgba(255,158,197,0.2),rgba(200,112,232,0.15)); padding:10px 12px; text-align:left; }
   .post-content td { padding:10px 12px; border-bottom:1px solid var(--card-border); }
   .post-content strong { color:var(--sakura-dark); }
+  .post-content blockquote { border-left:4px solid var(--sky); margin:16px 0; padding:8px 16px; color:var(--text-light); background:rgba(168,216,234,0.1); border-radius:0 8px 8px 0; }
   .back-link { display:inline-block; margin:40px 0; color:var(--sakura-dark); text-decoration:none; font-size:0.95em; }
   .back-link:hover { text-decoration:underline; }
   @media(max-width:768px){ .post-content { padding:16px; } .post-header h1 { font-size:1.4em; } }
@@ -29,7 +47,7 @@
 <canvas id="sakura-canvas"></canvas>
 <nav>
   <div class="nav-inner">
-    <span class="nav-logo">&#x1F338; MJC no Gakushuu Note</span>
+    <span class="nav-logo">🌸 MJC no Gakushuu Note</span>
     <div class="nav-links">
       <a href="../index.html">Home</a>
       <a href="../index.html#blog">Blog</a>
@@ -39,54 +57,74 @@
 <main>
   <article>
     <div class="post-header">
-      <h1>HashMap ???????? put ? resize</h1>
-      <div class="post-meta">&#x1F4C5; 2026-07-01 &nbsp;|&nbsp; <span class="tag t-java">Java</span> <span class="tag t-java">SourceCode</span> <span class="tag t-java">Interview</span></div>
-      <p style="color:var(--text-light);max-width:600px;margin:12px auto;font-size:0.95em">?????????? HashMap ? put ??????????????????????????????????????</p>
+      <h1>HashMap 源码深度解析：从 put 到 resize</h1>
+      <div class="post-meta">📅 2026-07-01 &nbsp;|&nbsp; <span class="tag t-java">Java</span> <span class="tag t-java">源码分析</span> <span class="tag t-java">面试</span></div>
+      <p style="color:var(--text-light);max-width:600px;margin:12px auto;font-size:0.95em">面试必考题！逐行分析 HashMap 的 put 方法、哈希冲突解决、红黑树转换和扩容机制——不只是背八股，而是真正看懂源码。</p>
     </div>
     <div class="post-content card">
-      
-<h2>?????? HashMap ??????</h2>
-<p>????????<strong>???????? + ?? + ????????????????????1.7 ????</strong>??????? Java ???</p>
 
-<h2>????????? + ?? + ???</h2>
-<p>JDK 1.8 ??HashMap ? <code>Node<K,V>[] table</code> ??????????????????? ? 8 ????? ? 64 ??????????</p>
+<h2>面试为什么爱问 HashMap 源码而不是背八股</h2>
+<p>因为它一道题能考出四层东西：<strong>数组 + 链表 + 红黑树的组合设计、哈希扰动函数的用意、扩容时避免重算 hash 的技巧，以及 JDK 1.7 到 1.8 的改动动机</strong>。把这四层讲通，等于当场证明你真的打开过 <code>java.util.HashMap</code> 这个文件，而不是背了一份面经。</p>
 
-<h2>put ?????</h2>
+<h2>底层结构是一个数组 + 链表 + 红黑树</h2>
+<p>JDK 1.8 里，HashMap 的主体是 <code>Node&lt;K,V&gt;[] table</code> 这个数组，也叫桶（bucket）。发生哈希冲突时，同一个桶里的节点挂成链表；当<strong>链表长度 ≥ 8 且数组容量 ≥ 64</strong> 时，链表转成红黑树，把最坏情况的查询从 O(n) 降到 O(log n)。</p>
+<p>注意这两个条件是「且」的关系：如果容量还不到 64，<code>treeifyBin</code> 会选择先扩容而不是树化——因为此时冲突多的真正原因是桶太少，扩容比换数据结构更划算。</p>
+
+<h2>put 方法流程</h2>
 <ol>
-  <li>?? key ? hash ??<code>(h = key.hashCode()) ^ (h >>> 16)</code>??? 16 ??? 16 ????????????</li>
-  <li>???????<code>(n - 1) & hash</code>???????????????</li>
-  <li>???????????</li>
-  <li>???????????????????????</li>
-  <li>???????????? key ????????? value????????</li>
-  <li>??????????? ? 8????????</li>
-  <li>???? size ???? threshold????????</li>
+  <li>计算 key 的 hash：<code>(h = key.hashCode()) ^ (h &gt;&gt;&gt; 16)</code>，把高 16 位异或进低 16 位，让高位也参与寻址，减少碰撞。</li>
+  <li>定位桶下标：<code>(n - 1) &amp; hash</code>，在容量是 2 的幂时等价于取模，但位运算快得多。</li>
+  <li>桶为空，直接放入新节点，结束。</li>
+  <li>桶不空，先比较首节点的 key 是否相同，相同则准备覆盖 value。</li>
+  <li>首节点不同就遍历链表（或树），找到相同 key 则替换 value，否则尾插一个新节点。</li>
+  <li>插入后如果链表长度 ≥ 8，调用 <code>treeifyBin</code> 尝试树化。</li>
+  <li>最后自增 <code>size</code>，若超过 <code>threshold</code> 则触发扩容。</li>
 </ol>
 
-<h2>resize ????</h2>
-<p>????????JDK 1.8 ????<strong>??????? hash</strong>??????? hash ???????? 0 ?? 1?</p>
+<pre><code>// JDK 1.8 HashMap#hash —— 扰动函数
+static final int hash(Object key) {
+    int h;
+    return (key == null) ? 0 : (h = key.hashCode()) ^ (h &gt;&gt;&gt; 16);
+}
+
+// 为什么容量必须是 2 的幂：让 (n - 1) &amp; hash 等价于 hash % n
+// n = 16 时，n - 1 = 0b1111，正好掩掉高位，只留低 4 位做下标
+index = (n - 1) &amp; hash;</code></pre>
+
+<h2>resize 扩容机制</h2>
+<p>每次扩容为原来的两倍。JDK 1.8 的巧妙之处在于<strong>不需要重新计算 hash</strong>：容量翻倍意味着下标多用到 hash 的一个新二进制位，所以只要看原 hash 值在这个新增位上是 0 还是 1，就能确定节点的去向。</p>
 <ul>
-  <li>??? 0?????</li>
-  <li>??? 1??? = ??? + ???</li>
+  <li>新增位为 0：下标不变，节点留在原位置（源码里的 <code>lo</code> 链）。</li>
+  <li>新增位为 1：新下标 = 原下标 + 原容量（源码里的 <code>hi</code> 链）。</li>
 </ul>
 
-<h2>?????</h2>
-<ul>
-  <li>?????? 2 ??????????????</li>
-  <li>???????? 0.75???????????</li>
-  <li>JDK 1.7 ????? 1.8 ???????????1.7 ???????????</li>
-  <li>?????????? AVL ??????????????</li>
-</ul>
+<pre><code>// resize() 中拆分链表的核心判断，oldCap 是扩容前的容量
+if ((e.hash &amp; oldCap) == 0)
+    // 落在 lo 链：新下标 == 原下标 j
+else
+    // 落在 hi 链：新下标 == j + oldCap</code></pre>
 
-<p><strong>?????????HashMap ???</strong></p>
+<p>一次位运算替代一次完整的 rehash，这就是 1.8 相对 1.7 在扩容上的主要优化。</p>
+
+<h2>几个易错点</h2>
+<ul>
+  <li>容量为什么必须是 2 的幂？为了让 <code>(n - 1) &amp; hash</code> 能等价于取模，同时保证位分布均匀。</li>
+  <li>负载因子为什么默认 0.75？空间与时间的折中：再高冲突概率显著上升，再低则浪费内存、频繁扩容。</li>
+  <li>JDK 1.7 的头插法在 1.8 改成了尾插法，因为 1.7 在并发扩容时可能形成环形链表，导致 get 死循环。</li>
+  <li>为什么用红黑树而不是 AVL 树？红黑树的插入旋转次数更少，在频繁写入的场景综合代价更低。</li>
+</ul>
+<blockquote>顺带一提：HashMap 本身不是线程安全的。上面第 3 条讲的死循环只是 1.7 的表现，1.8 改成尾插后不会再成环，但并发下依然会丢数据——要并发就用 <code>ConcurrentHashMap</code>。</blockquote>
+
+<p><strong>能把「结构 → put → resize」这三层串起来讲清楚，HashMap 这道题就稳了。</strong></p>
 
       <div style="text-align:center">
-        <a href="../index.html#blog" class="back-link">&#x2190; Back to Blog</a>
+        <a href="../index.html#blog" class="back-link">← Back to Blog</a>
       </div>
     </div>
   </article>
 </main>
 <footer>
-  <p>&#x1F338; <a href="https://mjc-0910.github.io">shinchan-m.github.io</a> &#xB7; Jiangnan University 2025</p>
+  <p>🌸 <a href="https://shinchan-m.github.io">shinchan-m.github.io</a> · 江南大学 2025 · Java Backend</p>
 </footer>
 <script src="../app.js"></script>
 </body>
