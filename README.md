@@ -57,7 +57,10 @@ shinchan-m.github.io/
 ├── vars.css          # CSS 变量：亮色默认值 + [data-theme=dark] 覆盖
 ├── app.js            # 全部交互与特效，含 FX 开关
 ├── .nojekyll         # 告诉 GitHub Pages 别走 Jekyll 构建
+├── guides/           # 可公开的 Markdown 源稿
+│   └── deepseek-qq-astrbot-napcat.md
 └── posts/            # 文章页
+    ├── deepseek-qq-astrbot-napcat-guide.html
     ├── windows-docker-linux-mysql.html
     ├── java-roadmap-14-weeks.html
     ├── job-market-2026-truth.html
