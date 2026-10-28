@@ -3,30 +3,31 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>把 DeepSeek 接进 QQ 小号的一次完整实战 | MJC no Gakushuu Note</title>
-<meta name="description" content="记录 AstrBot、NapCat、DeepSeek 和插件配置的完整过程，也写下插件卡死、ffmpeg 缺失、账号登录反了这些真实坑。">
+<title>AstrBot + NapCat + DeepSeek 通用 QQ 机器人接入教程 | MJC no Gakushuu Note</title>
+<meta name="description" content="按 27 个章节讲清环境准备、NapCat 登录、OneBot 连接、DeepSeek 模型、安全设置、人格、插件、长期记忆、语音和故障排查，并提供可点击目录。">
 <!-- 首屏前定好主题，暗色模式下不会闪一下白 -->
 <script>(function(){try{var s=localStorage.getItem('mjc-theme');var d=s==='dark'||(s!=='light'&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.setAttribute('data-theme',d?'dark':'light')}catch(e){document.documentElement.setAttribute('data-theme','light')}})()</script>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%B8%3C/text%3E%3C/svg%3E">
 <meta name="theme-color" content="#FFF0F5">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="MJC no Gakushuu Note">
-<meta property="og:title" content="把 DeepSeek 接进 QQ 小号的一次完整实战">
-<meta property="og:description" content="记录 AstrBot、NapCat、DeepSeek 和插件配置的完整过程，也写下插件卡死、ffmpeg 缺失、账号登录反了这些真实坑。">
+<meta property="og:title" content="AstrBot + NapCat + DeepSeek 通用 QQ 机器人接入教程">
+<meta property="og:description" content="按 27 个章节讲清环境准备、NapCat 登录、OneBot 连接、DeepSeek 模型、安全设置、人格、插件、长期记忆、语音和故障排查，并提供可点击目录。">
 <meta property="og:url" content="https://shinchan-m.github.io/posts/deepseek-qq-astrbot-napcat-guide.html">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2026-10-28">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="把 DeepSeek 接进 QQ 小号的一次完整实战">
-<meta name="twitter:description" content="记录 AstrBot、NapCat、DeepSeek 和插件配置的完整过程，也写下插件卡死、ffmpeg 缺失、账号登录反了这些真实坑。">
+<meta name="twitter:title" content="AstrBot + NapCat + DeepSeek 通用 QQ 机器人接入教程">
+<meta name="twitter:description" content="按 27 个章节讲清环境准备、NapCat 登录、OneBot 连接、DeepSeek 模型、安全设置、人格、插件、长期记忆、语音和故障排查，并提供可点击目录。">
 <link rel="stylesheet" href="../style.css?v=20261019b">
 <style>
+  html { scroll-padding-top: 0; }
   .post-header { text-align:center; padding:80px 20px 30px; }
   .post-header h1 { font-size:2em; color:var(--text); margin-bottom:16px; }
   .post-meta { color:var(--text-light); font-size:0.9em; margin-bottom:12px; }
   .post-content { max-width:800px; margin:0 auto; padding:20px; }
-  .post-content h2 { font-size:1.4em; color:var(--sakura-dark); margin:32px 0 12px; padding-left:12px; border-left:4px solid var(--sakura); }
-  .post-content h3 { font-size:1.1em; margin:24px 0 8px; color:var(--text); }
+  .post-content h2 { font-size:1.4em; color:var(--sakura-dark); margin:32px 0 12px; padding-left:12px; border-left:4px solid var(--sakura); scroll-margin-top:76px; }
+  .post-content h3 { font-size:1.1em; margin:24px 0 8px; color:var(--text); scroll-margin-top:76px; }
   .post-content p { margin-bottom:16px; font-size:1.05em; line-height:2; }
   .post-content ul, .post-content ol { margin:12px 0 20px 24px; }
   .post-content li { margin-bottom:8px; line-height:1.8; }
@@ -40,7 +41,7 @@
   .post-content blockquote { border-left:4px solid var(--sky); margin:16px 0; padding:8px 16px; color:var(--text-light); background:rgba(168,216,234,0.1); border-radius:0 8px 8px 0; }
   .back-link { display:inline-block; margin:40px 0; color:var(--sakura-dark); text-decoration:none; font-size:0.95em; }
   .back-link:hover { text-decoration:underline; }
-  @media(max-width:768px){ .post-content { padding:16px; } .post-header h1 { font-size:1.4em; } }
+  @media(max-width:768px){ .post-content { padding:16px; } .post-header h1 { font-size:1.4em; } .post-content h2, .post-content h3 { scroll-margin-top:120px; } }
 </style>
 </head>
 <body>
@@ -58,127 +59,825 @@
 <main>
   <article>
     <div class="post-header">
-      <h1>把 DeepSeek 接进 QQ 小号的一次完整实战</h1>
-      <div class="post-meta">📅 2026-10-28 &nbsp;|&nbsp; <span class="tag t-ai">AstrBot</span> <span class="tag t-docker">NapCat</span> <span class="tag t-ai">DeepSeek</span> <span class="tag t-linux">QQ机器人</span> <span class="tag t-spring">踩坑记录</span></div>
-      <p style="color:var(--text-light);max-width:600px;margin:12px auto;font-size:0.95em">记录 AstrBot、NapCat、DeepSeek 和插件配置的完整过程，也写下插件卡死、ffmpeg 缺失、账号登录反了这些真实坑。</p>
+      <h1>AstrBot + NapCat + DeepSeek 通用 QQ 机器人接入教程</h1>
+      <div class="post-meta">📅 2026-10-28 &nbsp;|&nbsp; <span class="tag t-java">AstrBot</span> <span class="tag t-java">NapCat</span> <span class="tag t-java">DeepSeek</span> <span class="tag t-java">QQ机器人</span> <span class="tag t-java">技术手册</span></div>
+      <p style="color:var(--text-light);max-width:600px;margin:12px auto;font-size:0.95em">按 27 个章节讲清环境准备、NapCat 登录、OneBot 连接、DeepSeek 模型、安全设置、人格、插件、长期记忆、语音和故障排查，并提供可点击目录。</p>
     </div>
     <div class="post-content card">
-      <p>我想做一个不太像客服的 QQ 机器人。它用 DeepSeek 生成回复，用一套配置包记住自己的性格，能在私聊里正常接话，也能在群里偶尔插一句。搭完以后，我发现真正耗时间的部分并不在安装，而在几个看起来像“卡死”的小问题。</p>
-      <p>这篇文章按我实际走过的顺序写。版本以搭建当天为准，AstrBot Launcher 是 0.3.13，AstrBot 是 4.29.3，NapCat 是 4.18.41，对话模型用 <code>deepseek-flash</code>。软件更新以后按钮位置可能变化，思路和排查顺序仍然能用。</p>
-      <p>先提醒一句。用 NapCat 这类第三方方式登录 QQ，可能触发腾讯的风控，也可能违反 QQ 使用协议。本文只记录正常配置过程，不提供绕过验证或规避风控的方法。准备尝试就用自己的小号，别拿常用大号冒险。</p>
-      <h2 id="_1">这套东西各自负责什么</h2>
+      <h2 id="_1">摘要</h2>
+      <p>这篇教程面向第一次在 Windows 上搭建 QQ 机器人的读者。完成后，电脑上会运行一套本地机器人服务。你的主 QQ 号可以私聊机器人小号，也可以把它拉进群，让它调用 DeepSeek 生成回复。</p>
+      <p>教程不依赖某个固定人格或配置包。基础聊天、人格、群聊、表情、长期记忆和语音分别讲清楚，你可以只做基础部分，也可以按需要继续加功能。</p>
+      <p>开始前要先接受一个边界。NapCat 通过非腾讯官方客户端登录 QQ，腾讯可能踢下线、要求安全验证，也可能限制账号功能。QQ 用户协议对第三方登录和自动化消息有约束。准备尝试时使用小号，不要拿常用号做实验。</p>
+      <h2 id="_2">文档信息</h2>
       <table>
       <thead>
       <tr>
-      <th>组件</th>
+      <th>项目</th>
+      <th>内容</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+      <td>文档版本</td>
+      <td>v1.0</td>
+      </tr>
+      <tr>
+      <td>适用系统</td>
+      <td>Windows 10 和 Windows 11</td>
+      </tr>
+      <tr>
+      <td>软件范围</td>
+      <td>AstrBot 4.x、NapCat 4.x、DeepSeek API</td>
+      </tr>
+      <tr>
+      <td>使用难度</td>
+      <td>中等</td>
+      </tr>
+      <tr>
+      <td>预计搭建时间</td>
+      <td>60 到 120 分钟</td>
+      </tr>
+      <tr>
+      <td>最近更新</td>
+      <td>2026-10-28</td>
+      </tr>
+      </tbody>
+      </table>
+      <h2 id="_3">阅读路线</h2>
+      <table>
+      <thead>
+      <tr>
+      <th>读者状态</th>
+      <th>建议阅读顺序</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+      <td>从未安装过</td>
+      <td>01 到 18，先完成基础聊天和安全设置</td>
+      </tr>
+      <tr>
+      <td>已能聊天，要加功能</td>
+      <td>19 到 21，按需要增加记忆、语音或群聊插件</td>
+      </tr>
+      <tr>
+      <td>已经卡住</td>
+      <td>22 和 23，按日志和错误现象定位</td>
+      </tr>
+      <tr>
+      <td>准备迁移或重装</td>
+      <td>25 和 26，先备份再操作</td>
+      </tr>
+      </tbody>
+      </table>
+      <h2 id="contents">目录</h2>
+      <p>章节名称可以点击跳转，章节末尾可以返回这里。</p>
+      <p><strong>快捷入口</strong></p>
+      <table>
+      <thead>
+      <tr>
+      <th>分类</th>
+      <th>常用章节</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+      <td>核心接入</td>
+      <td><a href="#sec-07">AstrBot</a> · <a href="#sec-09">NapCat</a> · <a href="#sec-12">QQ 登录</a> · <a href="#sec-15">DeepSeek</a></td>
+      </tr>
+      <tr>
+      <td>扩展与排错</td>
+      <td><a href="#sec-19">长期记忆</a> · <a href="#sec-20">语音</a> · <a href="#sec-23">常见错误</a></td>
+      </tr>
+      </tbody>
+      </table>
+      <table>
+      <thead>
+      <tr>
+      <th>阶段</th>
+      <th>章节</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+      <td>准备与总览</td>
+      <td><a href="#sec-01">01 完成后会得到什么</a></td>
+      </tr>
+      <tr>
+      <td>准备与总览</td>
+      <td><a href="#sec-02">02 适用环境和准备工作</a></td>
+      </tr>
+      <tr>
+      <td>准备与总览</td>
+      <td><a href="#sec-03">03 方案选择</a></td>
+      </tr>
+      <tr>
+      <td>准备与总览</td>
+      <td><a href="#sec-04">04 成本、内存和磁盘怎么估</a></td>
+      </tr>
+      <tr>
+      <td>准备与总览</td>
+      <td><a href="#sec-05">05 组件分工和端口</a></td>
+      </tr>
+      <tr>
+      <td>准备与总览</td>
+      <td><a href="#sec-06">06 一次完整搭建的顺序</a></td>
+      </tr>
+      <tr>
+      <td>AstrBot</td>
+      <td><a href="#sec-07">07 安装 AstrBot Launcher</a></td>
+      </tr>
+      <tr>
+      <td>AstrBot</td>
+      <td><a href="#sec-08">08 AstrBot 文件放在哪里</a></td>
+      </tr>
+      <tr>
+      <td>NapCat</td>
+      <td><a href="#sec-09">09 安装 NapCat</a></td>
+      </tr>
+      <tr>
+      <td>NapCat</td>
+      <td><a href="#sec-10">10 启动 NapCat</a></td>
+      </tr>
+      <tr>
+      <td>NapCat</td>
+      <td><a href="#sec-11">11 Windows 权限和杀毒软件</a></td>
+      </tr>
+      <tr>
+      <td>连接与模型</td>
+      <td><a href="#sec-12">12 登录 QQ 小号</a></td>
+      </tr>
+      <tr>
+      <td>连接与模型</td>
+      <td><a href="#sec-13">13 创建 OneBot v11 机器人</a></td>
+      </tr>
+      <tr>
+      <td>连接与模型</td>
+      <td><a href="#sec-14">14 配置 NapCat 的 WebSocket 客户端</a></td>
+      </tr>
+      <tr>
+      <td>连接与模型</td>
+      <td><a href="#sec-15">15 接入 DeepSeek</a></td>
+      </tr>
+      <tr>
+      <td>基础配置</td>
+      <td><a href="#sec-16">16 先做安全设置</a></td>
+      </tr>
+      <tr>
+      <td>基础配置</td>
+      <td><a href="#sec-17">17 创建人格</a></td>
+      </tr>
+      <tr>
+      <td>基础配置</td>
+      <td><a href="#sec-18">18 安装插件</a></td>
+      </tr>
+      <tr>
+      <td>扩展功能</td>
+      <td><a href="#sec-19">19 长期记忆</a></td>
+      </tr>
+      <tr>
+      <td>扩展功能</td>
+      <td><a href="#sec-20">20 语音</a></td>
+      </tr>
+      <tr>
+      <td>扩展功能</td>
+      <td><a href="#sec-21">21 每天启动和关闭</a></td>
+      </tr>
+      <tr>
+      <td>运行与维护</td>
+      <td><a href="#sec-22">22 日志应该怎么看</a></td>
+      </tr>
+      <tr>
+      <td>运行与维护</td>
+      <td><a href="#sec-23">23 常见错误排查</a></td>
+      </tr>
+      <tr>
+      <td>运行与维护</td>
+      <td><a href="#sec-24">24 安全和隐私</a></td>
+      </tr>
+      <tr>
+      <td>运行与维护</td>
+      <td><a href="#sec-25">25 备份、迁移和重装</a></td>
+      </tr>
+      <tr>
+      <td>运行与维护</td>
+      <td><a href="#sec-26">26 最终检查表</a></td>
+      </tr>
+      <tr>
+      <td>运行与维护</td>
+      <td><a href="#sec-27">27 参考资料</a></td>
+      </tr>
+      </tbody>
+      </table>
+      <hr />
+      <h2 id="sec-01">01 完成后会得到什么</h2>
+      <p>最基础的版本包括四个结果。</p>
+      <ol>
+      <li>AstrBot 在本机运行，能打开管理后台。</li>
+      <li>NapCat 登录 QQ 小号，成功连接 AstrBot。</li>
+      <li>DeepSeek 成为默认聊天模型。</li>
+      <li>主号私聊小号时能收到正常回复。</li>
+      </ol>
+      <p>可选功能包括长期记忆、语音、表情包、群聊插话、主动聊天、QQ 空间和资料修改。它们不是基础接入的前置条件。第一次搭建先完成这四项，后面每加一个插件就单独测试一次。</p>
+      <p><a href="#contents">↑ 返回目录</a></p>
+      <hr />
+      <h2 id="sec-02">02 适用环境和准备工作</h2>
+      <p>Windows 10 和 Windows 11 都可以。基础聊天用 8 GB 内存能跑，16 GB 会更宽松。长期记忆如果选本机 Ollama，还要预留几 GB 磁盘和额外内存。</p>
+      <p>需要一个 QQ 小号。小号最好已经绑定手机号，并能正常登录手机 QQ。新注册的号风控概率更高，遇到验证时也更麻烦。</p>
+      <p>需要一个 DeepSeek 开放平台账号。注册后在平台里创建 API Key，并先充少量余额。Key 只在创建时显示一次，复制后放进密码管理器，不要写进公开仓库。</p>
+      <p>安装目录尽量使用纯英文路径，例如下面这样。</p>
+      <pre><code class="language-text">D:\AstrBot
+      D:\NapCat
+      </code></pre>
+      <p>路径里有空格通常也能运行，但后面的命令需要加引号。第一次搭建时，英文路径、无空格目录能少掉一类问题。</p>
+      <p>如果电脑会自动睡眠，需要关闭睡眠和休眠。机器人依赖本机在线，电脑合盖休眠以后，AstrBot、NapCat 和 QQ 都会停止工作。</p>
+      <p><a href="#contents">↑ 返回目录</a></p>
+      <hr />
+      <h2 id="sec-03">03 方案选择</h2>
+      <p>先把需求缩小，不要一开始把所有插件都装上。</p>
+      <table>
+      <thead>
+      <tr>
+      <th>目标</th>
+      <th>必需组件</th>
+      <th>额外要求</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+      <td>只在私聊里聊天</td>
+      <td>AstrBot、NapCat、DeepSeek</td>
+      <td>无</td>
+      </tr>
+      <tr>
+      <td>增加长期记忆</td>
+      <td>LivingMemory 或同类插件</td>
+      <td>Ollama 或云端嵌入接口</td>
+      </tr>
+      <tr>
+      <td>增加语音</td>
+      <td>TTS 提供商、语音插件</td>
+      <td>ffmpeg，云端语音还要 API 凭证</td>
+      </tr>
+      <tr>
+      <td>增加表情包</td>
+      <td>meme_manager 或同类插件</td>
+      <td>额外磁盘空间</td>
+      </tr>
+      <tr>
+      <td>进群聊天</td>
+      <td>OneBot 机器人、群聊插件</td>
+      <td>群会话加入白名单</td>
+      </tr>
+      </tbody>
+      </table>
+      <p>这里的“插件”可以由 AstrBot 插件市场安装。不同版本的插件配置项可能变化，安装前要先确认它支持的 AstrBot 版本。</p>
+      <p><a href="#contents">↑ 返回目录</a></p>
+      <hr />
+      <h2 id="sec-04">04 成本、内存和磁盘怎么估</h2>
+      <p>DeepSeek 按 token 计费，输入和输出分别计算。私聊里每次发送的上下文越长，费用越高。群聊通常还要经过“是否回复”的判断，模型调用次数会比私聊多。</p>
+      <p>第一次测试只充少量余额就够。平台价格会调整，文章里不写死具体价格，创建 Key 之前先看 DeepSeek 控制台的当前价格页。</p>
+      <p>长期记忆也需要模型调用。记忆插件定期把聊天内容总结成短文，总结请求同样会消耗 DeepSeek 额度。嵌入模型负责把文本转成向量，本机 Ollama 不需要按次付费，云端嵌入接口的价格和免费额度要看服务商页面。</p>
+      <p>语音费用取决于是否使用云端服务。Edge 一类免费方案成本低，声音也更机械。豆包一类云端语音通常按生成时长收费，一段回复合成一条语音，等待时间会比文字回复长很多。</p>
+      <p>磁盘占用可以按下面几个区间预估。</p>
+      <table>
+      <thead>
+      <tr>
+      <th>项目</th>
+      <th>大致占用</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+      <td>AstrBot 和实例依赖</td>
+      <td>2 GB 左右，随版本增长</td>
+      </tr>
+      <tr>
+      <td>NapCat 和 QQ 内核</td>
+      <td>1.5 GB 到 2 GB</td>
+      </tr>
+      <tr>
+      <td>Ollama 程序和基础模型</td>
+      <td>2 GB 到 4 GB</td>
+      </tr>
+      <tr>
+      <td>大表情包资源</td>
+      <td>数百 MB 到数 GB</td>
+      </tr>
+      <tr>
+      <td>聊天数据和日志</td>
+      <td>初期很小，长期运行会增长</td>
+      </tr>
+      </tbody>
+      </table>
+      <p>安装前至少留出 10 GB 空间。长期记忆和大表情包全部安装时，留出 15 GB 更稳妥。</p>
+      <p><a href="#contents">↑ 返回目录</a></p>
+      <hr />
+      <h2 id="sec-05">05 组件分工和端口</h2>
+      <p>理解消息从哪里经过，排错会快很多。</p>
+      <pre><code class="language-text">主号 QQ
+        ↓ 发送消息
+      机器人小号 QQ
+        ↓
+      NapCat
+        ↓ OneBot v11 WebSocket
+      AstrBot
+        ↓ API 请求
+      DeepSeek
+        ↓ 返回文本
+      AstrBot
+        ↓
+      NapCat
+        ↓
+      机器人小号 QQ
+      </code></pre>
+      <p>三个端口分别负责不同任务。</p>
+      <table>
+      <thead>
+      <tr>
+      <th>端口</th>
+      <th>用途</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+      <td>AstrBot WebUI 随机端口</td>
+      <td>打开管理后台</td>
+      </tr>
+      <tr>
+      <td><code>6199</code></td>
+      <td>AstrBot 接收 NapCat 消息</td>
+      </tr>
+      <tr>
+      <td><code>6099</code></td>
+      <td>打开 NapCat 自己的 WebUI</td>
+      </tr>
+      </tbody>
+      </table>
+      <p>WebUI 的随机端口每次部署可能变化，<code>6199</code> 和 <code>6099</code> 通常固定。看到后台端口变化时，不要去改 OneBot 的 <code>6199</code>。</p>
+      <p><a href="#contents">↑ 返回目录</a></p>
+      <hr />
+      <h2 id="sec-06">06 一次完整搭建的顺序</h2>
+      <p>新手容易把插件、语音和记忆一起装，出错以后不知道是哪一层停了。下面这个顺序能让每一步都有明确的成功标志。</p>
+      <ol>
+      <li>安装 AstrBot 并进入 WebUI。</li>
+      <li>安装 NapCat，成功登录 QQ 小号。</li>
+      <li>在 AstrBot 创建 OneBot v11 机器人。</li>
+      <li>在 NapCat 创建 WebSocket 客户端，确认 <code>6199</code> 已连接。</li>
+      <li>配置 DeepSeek，主号私聊小号能收到回复。</li>
+      <li>设置白名单、管理员和电脑能力限制。</li>
+      <li>创建人格和分段回复。</li>
+      <li>按需要安装群聊、表情、记忆和语音插件。</li>
+      </ol>
+      <p>每一步测试通过再继续。基础聊天没有跑通时，不要先排查豆包语音或本地记忆。</p>
+      <p><a href="#contents">↑ 返回目录</a></p>
+      <hr />
+      <h2 id="sec-07">07 安装 AstrBot Launcher</h2>
+      <p>浏览器打开 AstrBot Launcher 的 GitHub Releases 页面，下载 Windows x64 安装包。文件名里通常会带有版本号，以页面最新稳定版为准。</p>
+      <p>安装时选择前面准备好的英文目录，例如 <code>D:\AstrBot</code>。Windows 可能弹出 SmartScreen 提示，确认安装包来自官方 Release 后再运行。</p>
+      <p>第一次打开启动器以后，先处理组件管理。</p>
+      <ol>
+      <li>打开“高级”里的中国大陆加速选项。</li>
+      <li>进入组件管理，等待 Python、uv 和 Node.js 下载完成。</li>
+      <li>三个组件都显示已下载，再创建实例。</li>
+      <li>实例版本选择当前稳定版。</li>
+      <li>端口留空或选择自动分配。</li>
+      </ol>
+      <p>创建实例后，启动器会自动下载 AstrBot 本体、创建虚拟环境并安装依赖。安装依赖是耗时最长的一步。进度停在某个数字几分钟并不罕见，只要日志没有报错就继续等。</p>
+      <p>实例状态显示“运行中”以后，启动器会弹出后台账号和密码。立即登录后台，把默认密码换成自己的强密码。密码只保存在自己手里，不要放进公开截图。</p>
+      <p>能打开登录页并进入后台，说明 AstrBot 这一层已经可用。</p>
+      <h3 id="71-astrbot">7.1 AstrBot 启动失败时</h3>
+      <p>先看启动器日志，不要直接删除实例。常见原因通常能从日志里看出来。</p>
+      <table>
+      <thead>
+      <tr>
+      <th>日志现象</th>
+      <th>处理办法</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+      <td>组件下载卡住</td>
+      <td>检查加速选项，重试组件下载</td>
+      </tr>
+      <tr>
+      <td>安装依赖报网络错误</td>
+      <td>换镜像或关闭加速后重试</td>
+      </tr>
+      <tr>
+      <td>虚拟环境损坏</td>
+      <td>在故障排除里清空虚拟环境再启动</td>
+      </tr>
+      <tr>
+      <td>后台密码没记下</td>
+      <td>到启动器日志里找第一次启动生成的密码</td>
+      </tr>
+      <tr>
+      <td>WebUI 检查失败</td>
+      <td>确认实例端口没有被其他程序占用</td>
+      </tr>
+      </tbody>
+      </table>
+      <p>不要把整台电脑上的 Python 环境随意删除。启动器自己的 Python、uv 和实例虚拟环境是分开的，手动删除容易让实例无法恢复。</p>
+      <p><a href="#contents">↑ 返回目录</a></p>
+      <hr />
+      <h2 id="sec-08">08 AstrBot 文件放在哪里</h2>
+      <p>启动器会把公共组件和实例分开保存。</p>
+      <pre><code class="language-text">启动器安装目录
+        程序本体和卸载器
+
+      用户数据目录
+        components/       Python、uv 和 Node.js
+        instances/        AstrBot 实例
+        versions/         实例版本压缩包
+      </code></pre>
+      <p>默认用户数据目录一般位于当前用户目录下。安装时如果改过数据目录，以启动器“高级”页面显示的路径为准。</p>
+      <p>实例里的 <code>core/data</code> 保存配置、人格、插件和数据库。这个目录比程序源码重要得多，迁移前先备份它。</p>
+      <p>不要在 AstrBot 运行期间直接覆盖 <code>data</code> 目录。先在启动器里停止实例，再复制备份。恢复时也先停止实例，覆盖完成后再启动。</p>
+      <p>常见需要保存的内容包括下面几项。</p>
+      <pre><code class="language-text">data/config/             插件配置
+      data/plugins/            已安装插件
+      data/plugin_data/        插件运行数据
+      data/*.db                机器人数据库
+      data/cmd_config.json     主要配置
+      </code></pre>
+      <p>API Key 和 Token 可能也保存在配置中。备份文件不要上传到公开仓库，不要发给别人。</p>
+      <p><a href="#contents">↑ 返回目录</a></p>
+      <hr />
+      <h2 id="sec-09">09 安装 NapCat</h2>
+      <p>从 NapNeko/NapCatQQ 的 Releases 页面下载 Windows Shell 一键包。解压到 <code>D:\NapCat</code>，不要直接放在浏览器的临时下载目录。</p>
+      <p>运行 <code>NapCatInstaller.exe</code>。安装器会下载 QQ 内核和 NapCat 本体，下载过程中可能切换到其他镜像。安装完成后会多出一个类似 <code>NapCat.52230.Shell</code> 的目录。</p>
+      <p>QQ 内核大约几百 MB，NapCat 本体通常小很多。安装器会先尝试腾讯官方下载源，失败时再尝试备用仓库。整个过程受网络影响，卡在下载阶段时先看当前文件名和日志，不要连续启动多个安装器。</p>
+      <p>如果 GitHub 下载很慢，可以使用 AstrBot 官方文档或 NapCat 文档里列出的加速站。第三方加速站会变化，下载完成后要核对发布页给出的文件大小或哈希。</p>
+      <p>这个目录里有两类常见文件，作用不同。</p>
+      <pre><code class="language-text">NapCatInstaller.exe       只用于安装和重装
+      NapCat.&lt;数字&gt;.Shell       日常运行目录
+        NapCatWinBootMain.exe   启动 NapCat 的主程序
+        QQ.exe                 由 NapCat 调用，不要手动开
+      </code></pre>
+      <p>安装器报压缩包损坏时，先删除未完成的 <code>NapCat.Shell.zip</code> 和残留的 <code>NapCat.&lt;数字&gt;.Shell</code>，再重新下载。不要保留半包反复解压。</p>
+      <p>安装器提示版本目录无法移动时，经常是上一次安装留下了残留文件夹。关闭 NapCat 和 QQ，删除未完成的 <code>NapCat.&lt;数字&gt;.Shell</code>，保留已经下载完整的 QQ 安装包，再重新运行安装器。</p>
+      <p>安装完成后，先确认 <code>NapCatWinBootMain.exe</code> 和目标版本目录都存在，再开始登录。缺少主程序或 <code>versions</code> 目录，说明安装没有真正结束。</p>
+      <p><a href="#contents">↑ 返回目录</a></p>
+      <hr />
+      <h2 id="sec-10">10 启动 NapCat</h2>
+      <p>目录里有批处理时，双击启动批处理最简单。批处理通常会设置 UTF-8 代码页，然后调用主程序。</p>
+      <p>不用批处理也可以手动启动。打开 PowerShell，先切换控制台编码，再进入实际目录。</p>
+      <pre><code class="language-powershell">chcp 65001
+      Set-Location -LiteralPath 'D:\NapCat\NapCat.52230.Shell'
+      .\NapCatWinBootMain.exe
+      </code></pre>
+      <p>目录名里的数字按自己的版本填写。PowerShell 不识别 CMD 的 <code>cd /d</code>，直接写 <code>Set-Location</code> 或 <code>cd</code>。</p>
+      <p>只启动 <code>NapCatWinBootMain.exe</code> 这一份。不要同时双击 <code>QQ.exe</code>。NapCat 会自己创建 QQ 子进程，手动再开 QQ 会导致重复登录和端口冲突。</p>
+      <p>启动后控制台会显示 NapCat WebUI 地址和 Token。浏览器打开类似下面的地址。</p>
+      <pre><code class="language-text">http://127.0.0.1:6099/webui
+      </code></pre>
+      <p>页面要求登录密钥时，复制控制台里的 <code>WebUi Token</code>。这个 Token 不是 QQ 密码，也不是 AstrBot 后台密码。</p>
+      <h3 id="101-napcat">10.1 NapCat 控制台中文乱码</h3>
+      <p>乱码通常来自 Windows 控制台代码页，不会改变 QQ 登录结果。错误码、端口号和网址都是 ASCII，仍然可以正常判断。</p>
+      <p>把代码页设为 <code>65001</code> 后重新启动，中文一般就能正常显示。</p>
+      <pre><code class="language-powershell">chcp 65001
+      </code></pre>
+      <p>如果系统终端仍然显示异常，可以换用 Windows Terminal，或在启动批处理里保留编码设置。不要因为乱码反复重装 NapCat。</p>
+      <p><a href="#contents">↑ 返回目录</a></p>
+      <hr />
+      <h2 id="sec-11">11 Windows 权限和杀毒软件</h2>
+      <p>日常运行 AstrBot 和 NapCat 通常不需要管理员权限。安装器请求管理员权限时确认来源，之后不要为了省事让所有程序永久以管理员身份运行。</p>
+      <p>第一次启动可能弹出 Windows SmartScreen 或防火墙提示。SmartScreen 只对可信安装包放行。Firewall 询问是否允许程序访问网络时，只在本机使用就保留私网范围，不要开放公网。</p>
+      <p>杀毒软件可能扫描刚解压的 QQ 内核和 Node 模块，导致安装器短暂显示“拒绝访问”。先等扫描结束再重试。反复失败时，可以只为明确的安装目录添加排除项，不要关闭整台电脑的实时保护。</p>
+      <p><a href="#contents">↑ 返回目录</a></p>
+      <hr />
+      <h2 id="sec-12">12 登录 QQ 小号</h2>
+      <p>NapCat WebUI 提供扫码登录和快速登录。快速登录依赖之前的登录状态，状态失效时会提示重新登录。扫码登录需要使用手机 QQ。</p>
+      <p>扫码前先确认手机登录的是机器人小号。扫码以后，在手机上点允许登录或确认登录。二维码通常两分钟内有效，过期会生成新的二维码。</p>
+      <p>登录成功后，控制台会出现账号在线、网络已连接一类信息。快速登录列表里可能同时保存主号和小号，选择时不要点错。</p>
+      <p>如果列表里有多个账号，先核对昵称和用途。机器人应该使用小号，主号只在手机或普通 QQ 客户端里使用。登录完成后再看 NapCat 日志里的账号昵称，确认不是把主号挂了上去。</p>
+      <p>手机 QQ 的账号安全设置能减少一些登录失效。检查手机号是否绑定，清理不认识的登录设备，完成腾讯弹出的安全验证。快速登录状态过期时按页面要求重新验证，不保存来源不明的登录凭据。</p>
+      <h3 id="121">12.1 登录状态失效</h3>
+      <p>日志出现 <code>KickedOffLine</code> 时，QQ 账号的当前登录被服务端取消了。常见原因有几类。</p>
+      <ul>
+      <li>同一个 QQ 小号又在另一台电脑或另一个机器人程序里登录</li>
+      <li>QQ 安全策略要求重新验证</li>
+      <li>手机端主动退出了当前设备</li>
+      <li>二维码或快速登录状态过期</li>
+      </ul>
+      <p>先确认只有一份 NapCat 实例，再检查手机端是否把电脑踢下线。不要连续生成十几张二维码。必要时关闭 NapCat，清理残留 QQ 进程，重新启动一份再登录。</p>
+      <p><a href="#contents">↑ 返回目录</a></p>
+      <hr />
+      <h2 id="sec-13">13 创建 OneBot v11 机器人</h2>
+      <p>登录 AstrBot 后台，进入“机器人”，新建机器人。消息平台类别选择 OneBot v11。</p>
+      <p>填写下面几项后保存。</p>
+      <pre><code class="language-text">机器人名称        可以自定义，例如 MyBot
+      反向 WS 主机       127.0.0.1
+      反向 WS 端口       6199
+      Token             自己生成的一串随机字母和数字
+      </code></pre>
+      <p>机器人名称会影响会话 ID。后面设置白名单时，ID 开头的名称要和这里一致。</p>
+      <p><a href="#contents">↑ 返回目录</a></p>
+      <hr />
+      <h2 id="sec-14">14 配置 NapCat 的 WebSocket 客户端</h2>
+      <p>打开 NapCat WebUI，进入网络配置，新建 WebSocket 客户端。方向一定要选客户端，让 NapCat 主动连接 AstrBot。</p>
+      <pre><code class="language-text">URL       ws://127.0.0.1:6199/ws
+      Token     与 AstrBot 中的 Token 完全一致
+      心跳      1000
+      重连      1000
+      </code></pre>
+      <p>保存并启用配置。AstrBot 日志里应该出现下面这类信息。</p>
+      <pre><code class="language-text">aiocqhttp(OneBot v11) 适配器已连接
+      </code></pre>
+      <p>用系统命令也能看到 <code>6199</code> 的监听和连接状态。</p>
+      <pre><code class="language-powershell">Get-NetTCPConnection -LocalPort 6199
+      </code></pre>
+      <p>只有 <code>Listen</code> 表示 AstrBot 已经准备接收连接，但 NapCat 还没连上。出现 <code>Established</code> 才说明双方建立了连接。</p>
+      <h3 id="141">14.1 连接失败的三个检查点</h3>
+      <p>第一，确认 AstrBot 实例正在运行。<code>ECONNREFUSED 127.0.0.1:6199</code> 表示这个端口没有服务在监听。</p>
+      <p>第二，检查 URL 是否完整。<code>ws://127.0.0.1:6199/ws</code> 末尾的 <code>/ws</code> 不能漏。</p>
+      <p>第三，对比两边 Token。多一个空格、大小写不同或者引用了旧值，连接都会被拒绝。</p>
+      <p><a href="#contents">↑ 返回目录</a></p>
+      <hr />
+      <h2 id="sec-15">15 接入 DeepSeek</h2>
+      <p>打开 DeepSeek 开放平台，充值少量余额，创建 API Key。Key 不要贴在文章中，也不要上传到公开仓库。</p>
+      <p>注册平台账号后，先完成充值或查看当前赠送额度。进入 API Key 页面，创建一把给 AstrBot 专用的钥匙，名称可以写机器人的用途。复制后先验证有没有多余空格，再粘贴到 AstrBot。</p>
+      <p>不要购买所谓“无限额度”的共享 Key。第三方中转站可能记录聊天内容和密钥，价格也不透明。使用官方平台时，至少可以从用量页面看到每次调用的消耗。</p>
+      <p>进入 AstrBot 的“模型提供商”，新增 DeepSeek，把 Key 填进提供商源。保存后点击获取模型列表。</p>
+      <p>可用模型会随平台更新。基础聊天优先选择速度合适、价格透明的模型。把模型添加进 AstrBot 以后，还要进入配置文件里的模型设置，把默认对话模型指向刚添加的提供商。</p>
+      <p>主号私聊小号发一句简单问题。能收到模型回复，说明基础流程已经完成。</p>
+      <p>如果 QQ 能收到消息但没有回复，检查下面几项。</p>
+      <ol>
+      <li>模型提供商 Key 是否保存成功。</li>
+      <li>默认对话模型是否真的切换到了 DeepSeek。</li>
+      <li>DeepSeek 账户是否有余额。</li>
+      <li>AstrBot 日志里有没有模型鉴权错误。</li>
+      <li>白名单是否把主号排除在外。</li>
+      </ol>
+      <p>模型费用按输入和输出 token 计算，群聊会多一次或多次判断请求。具体价格以 DeepSeek 官方页面为准，不要照抄旧文章里的价格。</p>
+      <p>可以在 DeepSeek 控制台设置自己的充值上限。第一次接入不需要一次充很多钱，确认模型可用后再按使用量补充。</p>
+      <p><a href="#contents">↑ 返回目录</a></p>
+      <hr />
+      <h2 id="sec-16">16 先做安全设置</h2>
+      <p>机器人能回复以后，马上设置访问控制。否则陌生人或群友可能消耗你的余额，也可能触发管理指令。</p>
+      <p>用主号私聊机器人，发送下面的命令。</p>
+      <pre><code class="language-text">/sid
+      </code></pre>
+      <p>机器人会返回会话 ID。私聊 ID 通常由机器人名称、消息类型和主号 QQ 组成。复制完整 ID，不要只复制 QQ 号。</p>
+      <p>进入后台的访问控制页面，开启白名单，把会话 ID 加进去。再把主号 QQ 加入管理员列表。</p>
+      <p>如果机器人要进群，先用小群测试。把群会话 ID 加入白名单，格式以后台实际显示为准。群聊消息多，成本高，开始时把回复概率调低。</p>
+      <p>最后检查“使用电脑能力”。普通聊天选择“不允许任何环境”。允许执行命令或读写文件后，模型输出的风险会从聊天内容扩大到整台电脑。</p>
+      <p><a href="#contents">↑ 返回目录</a></p>
+      <hr />
+      <h2 id="sec-17">17 创建人格</h2>
+      <p>人格可以直接在 AstrBot 后台创建，不需要导入某个固定配置包。</p>
+      <p>新建人格时至少写清四个方面。</p>
+      <pre><code class="language-text">身份        它叫什么，是朋友、助手还是某个角色
+      语气        简短还是详细，正式还是口语
+      边界        不知道时怎么回答，哪些事情不能做
+      关系        谁可以管理它，陌生人消息如何处理
+      </code></pre>
+      <p>人格文本会随请求发送给模型提供商。不要把密码、Key、住址和身份证号写进人格。</p>
+      <p>保存人格后，在配置文件里把它设为默认人格。修改以后如果在 QQ 里没有变化，发送 <code>/reset</code> 清理当前会话，再重新测试。</p>
+      <h3 id="171">17.1 分段回复</h3>
+      <p>AstrBot 可以把一条长回复拆成多条短消息。进入平台设置里的分段回复，设置拆句规则和随机间隔。</p>
+      <p>第一次使用可以试 1.5 到 3.5 秒。间隔太长会让聊天变慢，太短则像连续刷屏。群聊和私聊的建议值不同，最好分别测试。</p>
+      <p><a href="#contents">↑ 返回目录</a></p>
+      <hr />
+      <h2 id="sec-18">18 安装插件</h2>
+      <p>插件可以从 AstrBot 插件市场安装，也可以从 GitHub 仓库安装。插件市场通常会记录兼容版本和下载地址。GitHub 安装更适合开发者，需要自己确认仓库可信度和版本要求。</p>
+      <p>装插件前先看三个信息。</p>
+      <ol>
+      <li>插件是否支持当前 AstrBot 大版本。</li>
+      <li>插件是否要求额外的 Python 包或外部程序。</li>
+      <li>插件是否会读取消息、图片、联系人或其他敏感数据。</li>
+      </ol>
+      <p>插件安装完成后，如果后台一直转圈，先查看是否有旧安装任务占用锁。重启实例后再试一次通常比连续重复点击更有效。</p>
+      <h3 id="181-github">18.1 插件市场、GitHub 和配置包</h3>
+      <p>插件市场适合普通用户。市场记录通常包含下载地址、兼容版本和作者信息。GitHub 适合需要最新版本或自己修改代码的人，安装前要确认仓库地址和版本。</p>
+      <p>GitHub 连接慢时，可以在 AstrBot 后台的网络设置里测试 GitHub 加速地址。这个设置只影响当前浏览器里的仓库安装，不会改变插件市场已经托管的下载地址。</p>
+      <p>配置包是可选方案。它通常包含人格、插件参数和导入脚本，适合想快速得到一套完整行为的人。使用前要检查来源、许可证和脚本内容，不要把来路不明的配置包直接运行在存有重要文件的电脑上。</p>
+      <p>配置包导入失败时，先看它在哪一步停止。插件下载失败可以手动安装后重跑，语音或记忆失败可以暂时选 0 跳过。重跑前看清提示，某些导入工具会把后台手工改过的设置重新覆盖。</p>
+      <h3 id="182">18.2 群聊插件</h3>
+      <p>群聊插件通常负责判断是否回复、回复概率、打字延迟和频率限制。配置时先从小群、小概率开始。</p>
+      <p>机器人被 @ 时是否一定回复、普通聊天是否插话、连续回复后是否进入冷却，这些选项需要分别设置。群里人多时，每条消息都调用模型会产生明显费用。</p>
+      <p>测试时先建一个两三个人的私密小群。把群会话 ID 加入白名单，再用主号 @ 机器人。确认基础回复正常，再打开“普通消息也可能回复”的选项。</p>
+      <p>群聊插件不能代替白名单。即使插件概率很低，机器人仍会读取群消息，配置白名单和权限时不要省掉这一步。</p>
+      <h3 id="183">18.3 表情包插件</h3>
+      <p>表情包插件一般有自己的资源广场。资源包下载会显示进度，有的包体积很大，先确认磁盘空间。</p>
+      <p>安装一套测试就够。一次下载多套大资源时，网络一断就会出现长时间等待。失败以后从插件页面重试，或者换一个镜像地址。</p>
+      <h3 id="184-qq">18.4 QQ 空间和资料插件</h3>
+      <p>发说说、改签名、改头像这些功能通常需要管理员权限。开启前先确认指令只允许主人使用，公开群里不要让陌生人触发。</p>
+      <p>自动发说说和自动改资料容易产生意外内容。第一次使用时关闭自动任务，只测试手动命令。</p>
+      <p><a href="#contents">↑ 返回目录</a></p>
+      <hr />
+      <h2 id="sec-19">19 长期记忆</h2>
+      <p>普通模型对话只接收有限长度的上下文。聊天轮数很多以后，早期内容会从当前窗口里消失。<code>/reset</code> 也会清空当前会话。</p>
+      <p>长期记忆插件会定期总结聊天内容，再把总结转成向量保存。之后聊到相关话题时，它会检索以前的记忆，把少量内容加入模型上下文。</p>
+      <h3 id="191-ollama">19.1 方案一，本机 Ollama</h3>
+      <p>安装 Ollama 后，使用命令行下载嵌入模型。</p>
+      <pre><code class="language-powershell">ollama pull bge-m3
+      ollama list
+      </code></pre>
+      <p><code>ollama list</code> 能看到 <code>bge-m3</code>，说明模型已经下载。常见嵌入接口地址如下。</p>
+      <pre><code class="language-text">http://127.0.0.1:11434/v1
+      </code></pre>
+      <p>在 LivingMemory 或同类插件里填写这个地址、模型名称和 1024 维嵌入。Ollama 服务没有运行时，记忆插件会报连接错误。</p>
+      <p>本地方案的数据和模型都在电脑上，代价是下载体积、内存占用和维护成本。</p>
+      <h3 id="192">19.2 方案二，云端嵌入接口</h3>
+      <p>硅基流动一类平台也提供 <code>BAAI/bge-m3</code>。注册后创建 API Key，把接口地址、Key、模型名称和维度填入插件。</p>
+      <pre><code class="language-text">接口地址  https://api.siliconflow.cn/v1
+      模型      BAAI/bge-m3
+      维度      1024
+      </code></pre>
+      <p>云端方案不需要本地下载模型，但要检查额度、价格和隐私说明。聊天内容可能被发送到嵌入服务商。</p>
+      <h3 id="193">19.3 测试记忆是否生效</h3>
+      <p>先聊十轮以上，顺便告诉机器人几件固定的小事，例如喜欢的食物和睡眠时间。然后发送 <code>/reset</code> 清空当前会话，再问它刚才提过的内容。</p>
+      <p>能回答说明记忆已经参与检索。回答不出来时，检查记忆插件是否启用、嵌入提供者是否连通、总结触发轮次是否已经达到。</p>
+      <p>记忆作用域一旦改变，旧记忆不一定自动迁移。长期使用前先确定是私聊记忆、群聊记忆还是统一作用域。</p>
+      <p><a href="#contents">↑ 返回目录</a></p>
+      <hr />
+      <h2 id="sec-20">20 语音</h2>
+      <p>语音属于可选功能。先决定是否接受费用和等待时间，再安装对应插件。</p>
+      <table>
+      <thead>
+      <tr>
+      <th>方案</th>
+      <th>特点</th>
+      <th>额外要求</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+      <td>Edge TTS</td>
+      <td>免费，部署简单，声音偏机器</td>
+      <td>可能需要 Python 包和 ffmpeg</td>
+      </tr>
+      <tr>
+      <td>豆包语音</td>
+      <td>声音自然，一段回复合成一条</td>
+      <td>火山引擎实名账号和应用凭证</td>
+      </tr>
+      <tr>
+      <td>Breeze 本机语音</td>
+      <td>免费，可自定义声音</td>
+      <td>显卡、模型和本机服务</td>
+      </tr>
+      </tbody>
+      </table>
+      <p>Edge TTS 适合先验证语音流程。安装对应语音插件或提供商，选择中文女声，再把发送概率调低。它不需要云端实名账号，失败时重点查 Python 依赖和 ffmpeg。</p>
+      <p>豆包语音需要火山引擎账号。注册并完成实名认证后，进入豆包语音旧版控制台，创建应用并开通音频生成模型的试用或按量额度。要复制的是应用管理里的 APP ID 和 Access Token，不要拿火山方舟的 API Key 代替。</p>
+      <p>旧版和新版控制台的产品入口不同。页面名称变化时先看 URL、产品说明和凭证字段，不要凭字段长度猜 Key 类型。导入以后让机器人试念一句短文本，确认云端返回音频，再恢复正常的回复概率。</p>
+      <p>Breeze 一类本机语音需要显卡、模型和常驻服务。显存较少时可以使用小模型，速度会慢一些。程序启动后要保证语音服务仍在运行，关闭服务以后机器人只能发文字。</p>
+      <p>大多数语音方案会在最后一步调用 ffmpeg 转码。先在 PowerShell 里检查。</p>
+      <pre><code class="language-powershell">ffmpeg -version
+      </code></pre>
+      <p>命令不存在时，安装完整 ffmpeg 构建，把 <code>bin</code> 目录加入用户环境变量 <code>Path</code>。修改后必须重启 AstrBot，新的进程才会读到新的 PATH。</p>
+      <p>机器上没有 winget 时，可以使用带静态二进制的 Python 包过渡。</p>
+      <pre><code class="language-powershell">python -m pip install imageio-ffmpeg
+      python -c &quot;import imageio_ffmpeg; print(imageio_ffmpeg.get_ffmpeg_exe())&quot;
+      </code></pre>
+      <p>把打印出的 <code>ffmpeg.exe</code> 放进一个固定目录，再把目录写进 PATH。完整构建通常还会提供 <code>ffprobe.exe</code>，长期使用更合适。</p>
+      <p>语音插件配置完成后，明确让机器人发一条语音测试。能收到音频，再调整发送概率。语音生成失败时先看 TTS 鉴权，再看 ffmpeg，最后再看 QQ 发送能力。</p>
+      <p><a href="#contents">↑ 返回目录</a></p>
+      <hr />
+      <h2 id="sec-21">21 每天启动和关闭</h2>
+      <p>正常运行时只需要两个主要程序。</p>
+      <table>
+      <thead>
+      <tr>
+      <th>程序</th>
       <th>作用</th>
       </tr>
       </thead>
       <tbody>
       <tr>
       <td>AstrBot</td>
-      <td>机器人大脑，负责后台、人格、模型和插件</td>
+      <td>后台、插件、人格和模型</td>
       </tr>
       <tr>
       <td>NapCat</td>
-      <td>登录 QQ 小号，把 QQ 消息转给 AstrBot</td>
-      </tr>
-      <tr>
-      <td>DeepSeek</td>
-      <td>真正生成回复的模型，通过 API 调用</td>
-      </tr>
-      <tr>
-      <td>配置包</td>
-      <td>一次性写入人格、插件参数、记忆和语音设置</td>
-      </tr>
-      <tr>
-      <td>LivingMemory</td>
-      <td>长期记忆，把以前聊过的内容总结后重新检索</td>
+      <td>登录 QQ 并转发消息</td>
       </tr>
       </tbody>
       </table>
-      <p>QQ 小号负责在线，NapCat 负责收发消息，AstrBot 负责决定怎么回复。DeepSeek 在云端工作，本地不需要下载几 GB 的模型。把这些角色分清以后，日志里谁出了问题会容易判断很多。</p>
-      <h2 id="astrbot">安装 AstrBot</h2>
-      <p>我用了 AstrBot 的图形启动器。安装路径放在 <code>D:\Astrabot</code>，实例版本选择 4.29.3。组件管理里先下载好 Python、uv 和 Node.js，再创建实例。第一次部署会创建虚拟环境、安装依赖、检查 WebUI，整个过程比普通桌面软件慢，但启动器会显示阶段。</p>
-      <p>实例运行起来以后，浏览器打开启动器给出的地址，登录后台并修改默认密码。后台地址通常只监听本机，随机端口每次可能变化，以后不要照抄文章里的端口号，以启动器当前显示的为准。</p>
-      <p>后台里有四项安全设置需要先处理。</p>
+      <p>比较稳妥的顺序是先启动 AstrBot，再启动 NapCat。NapCat 启动后会主动连接 <code>6199</code>，AstrBot 先运行可以少出现几次连接拒绝。</p>
+      <p>每天启动的检查过程如下。</p>
       <ol>
-      <li>给访问控制开启白名单，只允许自己的会话。</li>
-      <li>把自己的 QQ 号加入管理员列表。</li>
-      <li>确认“使用电脑能力”的运行环境是“不允许任何环境”。</li>
-      <li>把 DeepSeek Key、OneBot Token、后台密码和 NapCat WebUI Token 当成密码保管，不截图，不发群。</li>
+      <li>打开 AstrBot Launcher，启动实例。</li>
+      <li>等实例状态变成运行中。</li>
+      <li>打开 NapCat 主程序，控制台不要关闭。</li>
+      <li>在 NapCat WebUI 确认 QQ 小号在线。</li>
+      <li>查看 AstrBot 日志里的 OneBot 适配器是否已连接。</li>
+      <li>用主号发一句测试消息。</li>
       </ol>
-      <p>白名单会话 ID 可以先用大号给小号发送 <code>/sid</code> 取得。格式通常包含机器人名称、消息类型和自己的 QQ 号，机器人名称必须和后台创建时一致。</p>
-      <h2 id="napcat-qq">接上 NapCat 和 QQ</h2>
-      <p>NapCat 的一键包装好以后，目录里会出现一个 <code>NapCat.&lt;数字&gt;.Shell</code> 文件夹。日常启动只需要运行里面的 <code>NapCatWinBootMain.exe</code>。<code>NapCatInstaller.exe</code> 只负责安装，不要每次开机都点它，也不要手动启动目录里的 <code>QQ.exe</code>。</p>
-      <p>在 AstrBot 后台创建机器人时，平台选择 OneBot v11。反向 WebSocket 主机填 <code>127.0.0.1</code>，端口保持 <code>6199</code>，再设置一个较长的随机 Token。NapCat 的网络配置里建立 WebSocket 客户端，地址填 <code>ws://127.0.0.1:6199/ws</code>，Token 与 AstrBot 完全一致。心跳和重连间隔可以设为 1000 毫秒。</p>
-      <p>这两个程序启动顺序不必绝对固定。NapCat 连不到 AstrBot 时会重试，AstrBot 没启动时日志里会出现 <code>ECONNREFUSED 127.0.0.1:6199</code>。看到这个错误先检查 AstrBot 实例是否运行，不要急着重填 QQ 配置。</p>
-      <p>当天色正常时，两边连上的标志也很直接。AstrBot 日志里出现 <code>aiocqhttp(OneBot v11) 适配器已连接</code>，NapCat 侧不再连续报连接失败。</p>
-      <h2 id="deepseek">接上 DeepSeek</h2>
-      <p>DeepSeek 开放平台创建 API Key 后，在 AstrBot 的模型提供商里新增 DeepSeek，粘贴 Key 并保存。然后获取模型列表，选择 <code>deepseek-flash</code>，再把默认对话模型和图片转述模型都切过去。</p>
-      <p>Key 只显示一次。第一次拿到就应该放进本地密码管理器，或者至少放在一个不会被同步到公开仓库的文本文件里。文章、截图、报错日志和 GitHub Issue 都不要出现完整 Key。</p>
-      <p>模型接通以后可以先不折腾插件，直接在 QQ 里私聊一句。此时回复可能还是默认助手口吻，这是正常的，人格和插件还没导入。</p>
-      <h2 id="_2">导入大肥鱼配置包</h2>
-      <p>我用的配置包会把人格、分段回复、表情包、语音、QQ 空间、改签名和主动聊天这些设置一次写进 AstrBot。导入工具是命令行问答式脚本，第一次运行时需要输入后台地址、账号、密码、主人的 QQ 号，再选择记忆和语音方案。</p>
-      <p>第一次导入建议先选“不装记忆”。先把插件和聊天跑通，后面再单独启用 LivingMemory。语音可以先用免费的本地方案，也可以暂时关闭。</p>
-      <p>配置包会从 AstrBot 插件市场安装 <code>group_chat_plus</code>、<code>LivingMemory</code>、<code>meme_manager</code>、<code>qzone</code>、<code>qqprofile</code> 和 <code>proactive_chat</code>，还会装入几个随配置包提供的小插件。</p>
-      <p>这里遇到第一个长坑。<code>group_chat_plus</code> 的下载临时文件一直停在 0 字节，导入工具又看不到下载进度，看起来像死机。检查以后确认插件 CDN 的连接中断，本机 CPU 和模型都没有问题。后来换成从官方市场下载好的本地 ZIP，再在后台“从文件安装”，几十秒就完成了。</p>
-      <p>如果后台安装弹窗也一直转圈，先检查上一轮导入工具是否还占着插件安装锁。旧任务没有释放时，新的本地安装会排队。必要时关闭旧导入窗口，重启 AstrBot 实例，再上传 ZIP。</p>
-      <h2 id="_3">两套表情包为什么会等很久</h2>
-      <p>配置包默认会下载两套表情包。名字看起来只是几百张小图，实际仓库压缩包一个约 483 MB，另一个约 143 MB。导入工具单连接下载，没有百分比，网络慢的时候就很容易被误认为卡死。</p>
-      <p>我最后没有继续让它盲等。表情包插件自己有资源广场，那里能看到真实下载进度，也能取消和重试。加载几千张图对普通聊天没有决定作用，先把机器人主体跑通更重要。</p>
-      <p>如果也想节省时间，可以在导入前把配置清单里的表情包列表暂时留空，让其余设置先完成。以后进入 <code>meme_manager</code> 的资源广场，再逐套安装。不要把两套大仓库 ZIP 直接塞进普通插件上传入口，它们的目录结构和表情包插件自己的导入格式并不完全一样。</p>
-      <h2 id="ffmpeg">ffmpeg 导致语音发不出去</h2>
-      <p>豆包语音已经生成音频，QQ 里却一直没有语音条。日志里给出的原因很明确，系统没有 <code>ffmpeg</code>，音频格式转换失败。</p>
-      <p>我先检查了 <code>ffmpeg -version</code>，系统确实找不到这个命令。机器上也没有 <code>winget</code>，所以没法照最简单的包管理器步骤安装。</p>
-      <p>最后的处理办法是用 Python 的 <code>imageio-ffmpeg</code> 包取得静态 ffmpeg 二进制。</p>
-      <pre><code class="language-powershell">python -m pip install imageio-ffmpeg
-      python -c &quot;import imageio_ffmpeg; print(imageio_ffmpeg.get_ffmpeg_exe())&quot;
+      <p>停止运行时，先在启动器里停止 AstrBot 实例，再关闭 NapCat 控制台。直接强制关机可能让数据库和登录状态没有正常写入。</p>
+      <p>想设置开机自启动，可以在启动器里打开实例自启动，再用 Windows 任务计划程序启动 NapCat。不要同时保留多个手工启动入口，否则可能出现两份 NapCat。</p>
+      <p><a href="#contents">↑ 返回目录</a></p>
+      <hr />
+      <h2 id="sec-22">22 日志应该怎么看</h2>
+      <p>排错时先找第一条错误，不要只看最后一行。一个模型鉴权失败可能让后面的插件初始化连续报错，真正的起因仍在最前面。</p>
+      <p>日志一般有三处来源。</p>
+      <table>
+      <thead>
+      <tr>
+      <th>来源</th>
+      <th>适合查看什么</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+      <td>AstrBot Launcher 日志</td>
+      <td>实例部署、依赖安装、进程启动</td>
+      </tr>
+      <tr>
+      <td>AstrBot 后台“数据与日志”</td>
+      <td>模型、插件、平台适配器和消息处理</td>
+      </tr>
+      <tr>
+      <td>NapCat 控制台或 WebUI</td>
+      <td>QQ 登录、二维码、OneBot 网络连接</td>
+      </tr>
+      </tbody>
+      </table>
+      <p>AstrBot 日志里的 <code>aiocqhttp</code> 表示 QQ 平台适配器，<code>provider</code> 或 <code>completion</code> 表示模型，插件名通常出现在方括号里。看到错误先确认模块，再去对应页面检查。</p>
+      <p>NapCat 日志里的 <code>WebUi Token</code>、二维码地址和 WebSocket 状态可以帮助判断 QQ 登录。截图或发日志求助前，记得遮住 Token、QQ 号、群号和聊天正文。</p>
+      <p>需要确认网络连接时，可以用系统命令查看端口。</p>
+      <pre><code class="language-powershell">Get-NetTCPConnection -LocalPort 6199
       </code></pre>
-      <p>第二条命令会打印真实路径。把 <code>ffmpeg.exe</code> 放到一个稳定目录，再把该目录写进用户 PATH。长期使用更建议安装完整的 ffmpeg 构建，至少保留 <code>ffmpeg.exe</code> 和 <code>ffprobe.exe</code>。</p>
-      <p>改完 PATH 以后，AstrBot 需要重启一次，新的环境变量才会被进程读到。也可以用 AstrBot 自带的 Python 做一次真实转换测试，确认 <code>pydub</code> 能找到 ffmpeg，而不是只在终端里能运行。</p>
-      <pre><code>ffmpeg -version
-      </code></pre>
-      <p>只要这条命令能打印版本，并且后台重启后语音提供者设置正确，音频转换这一段就通了。</p>
-      <h2 id="_4">最容易被忽略的账号问题</h2>
-      <p>我中途一度以为 QQ 反复掉线全是风控。完整日志里有一段 <code>KickedOffLine</code>，它确实表示登录状态被服务端判为失效，但再往下看，问题比“风控”具体得多。</p>
-      <p>当时 NapCat 登录的是大号，小号反而成了聊天对面。日志里大号接收来自小号的私聊，方向和预期完全相反。配置目录里也同时出现了两个账号的 OneBot 配置，当晚被更新的那个属于大号。</p>
-      <p>这个错误会带来几个连锁现象。大号在手机或电脑上正常使用时，会把 NapCat 这边挤掉；扫码时稍不留神就用手机里当前打开的大号扫了；后台白名单和主人号码仍然正确，消息却总像在绕圈。</p>
-      <p>正确的方向只有一种。NapCat 登录小号，主人的大号给小号发消息，AstrBot 收到小号的消息，再由小号回复。</p>
-      <p>重新登录时，先在 NapCat WebUI 里退出当前账号，确认手机 QQ 登录的是小号，再扫码或选择小号进行快速登录。登录成功后看日志前缀，应该出现小号的昵称。千万别把大号挂进 NapCat，大号里的群和联系人比小号复杂得多，风险也更高。</p>
-      <h2 id="_5">控制台中文乱码怎么看</h2>
-      <p>我后来改成直接手动运行 <code>NapCatWinBootMain.exe</code>，没有使用批处理。启动以后控制台里大量中文变成乱码，错误码和英文路径却仍然正常。</p>
-      <p>这不是登录失败的直接原因。批处理里原本有一行 <code>chcp 65001</code>，直接启动 EXE 时没有执行它，Windows 控制台仍可能用旧代码页显示 UTF-8 日志。</p>
-      <p>如果坚持不用 <code>.bat</code>，可以在 PowerShell 里先切换代码页，再进入 NapCat 目录启动。</p>
-      <pre><code class="language-powershell">chcp 65001
-      Set-Location -LiteralPath 'D:\NapCat\NapCat.52230.Shell'
-      .\NapCatWinBootMain.exe
-      </code></pre>
-      <p>这样控制台会正常显示中文。二维码本身不会因为控制台乱码失效，这时主要看登录账号、二维码是否过期，以及 WebSocket 是否已经建立。</p>
-      <h2 id="_6">每天怎么手动启动</h2>
-      <p>我没有配置开机自动启动。每天需要手动打开两个程序。</p>
-      <p>先打开 AstrBot Launcher，在实例列表里点击启动，等状态变成“运行中”。这一步不要看到后台端口号变了就去改 NapCat 的 6199 端口，两个端口负责的事情不同。</p>
-      <p>再打开一个 PowerShell 窗口，进行下面的操作。</p>
-      <pre><code class="language-powershell">chcp 65001
-      Set-Location -LiteralPath 'D:\NapCat\NapCat.52230.Shell'
-      .\NapCatWinBootMain.exe
-      </code></pre>
-      <p>NapCat 启动后，在浏览器打开 <code>http://127.0.0.1:6099/webui</code>。如果要求输入 WebUI Token，就看控制台里 <code>WebUi Token</code> 那一行。登录 QQ 时选小号。快速登录状态失效就重新扫码，二维码过期以后不要拿旧图反复试，直接刷新。</p>
-      <p>判断是否真的可用，看两处就够了。NapCat 里有 <code>网络已连接</code>，AstrBot 里有 <code>OneBot v11 适配器已连接</code>。两边都在，再回 QQ 里聊天。</p>
-      <h2 id="_7">我最后保留的安全习惯</h2>
-      <p>机器人只使用小号，主人账号不交给 NapCat 登录。</p>
-      <p>后台开启白名单，只允许自己的会话进入。管理员列表填入大号，但不要把管理员权限公开给群里其他人。</p>
-      <p>电脑上只保留一份 NapCat 进程，不重复点击启动。发现掉线先看进程和端口，不要连续开新窗口。</p>
-      <p>所有 Key、Token、后台密码、WebUI 地址和二维码都不截图发群。日志可以记录错误码和连接状态，带二维码、账号标识、群号和聊天正文的部分需要打码。</p>
-      <p>如果 QQ 要求安全验证，就按腾讯页面完成手机号绑定和登录设备清理。验证完成以后仍然反复掉线，换一个更稳定的小号往往比继续改参数更有效。</p>
-      <h2 id="_8">参考</h2>
+      <p><code>Listen</code> 表示 AstrBot 已准备接收连接，<code>Established</code> 才表示 NapCat 已经连上。只有前者时，不要怀疑模型，先检查 NapCat。</p>
+      <p><a href="#contents">↑ 返回目录</a></p>
+      <hr />
+      <h2 id="sec-23">23 常见错误排查</h2>
+      <h3 id="231">23.1 后台打不开</h3>
+      <p>先确认 AstrBot 实例显示运行中。端口变化以后使用启动器的“打开 WebUI”，不要一直尝试旧端口。</p>
+      <h3 id="232-econnrefused-1270016199">23.2 <code>ECONNREFUSED 127.0.0.1:6199</code></h3>
+      <p>这个错误表示 NapCat 找不到 AstrBot 的 <code>6199</code> 服务。先确认 AstrBot 已启动，再确认机器人平台配置里的端口是 6199。</p>
+      <h3 id="233">23.3 二维码过期</h3>
+      <p>重新刷新二维码后立刻扫描。手机 QQ 要登录机器人小号，扫码后还要在手机上确认。旧二维码不要截图长期保存。</p>
+      <h3 id="234">23.4 扫码后提示登录失败</h3>
+      <p>先看 NapCat 完整日志。登录操作可能被同一账号的其他登录踢下线，也可能触发了腾讯安全验证。清理重复实例，确认账号，等待一段时间后再试。</p>
+      <h3 id="235">23.5 快速登录状态失效</h3>
+      <p>快速登录依赖此前的登录凭据。凭据过期后改用扫码。若手机号或设备验证发生变化，重新完成手机端安全设置。</p>
+      <h3 id="236">23.6 控制台乱码</h3>
+      <p>先执行 <code>chcp 65001</code>，再启动 NapCat。乱码会影响阅读，不会自动改变 QQ 登录状态。</p>
+      <h3 id="237">23.7 插件安装长时间没有反应</h3>
+      <p>检查插件 CDN 是否可访问，确认是否有旧安装任务占用插件锁。必要时重启实例，使用官方市场下载的 ZIP 本地安装。</p>
+      <h3 id="238">23.8 语音文件生成失败</h3>
+      <p>检查 <code>ffmpeg -version</code>、TTS 提供商凭证和插件日志。ffmpeg 安装后没有重启 AstrBot，旧进程仍可能找不到新 PATH。</p>
+      <h3 id="239">23.9 能收到消息但不回复</h3>
+      <p>按顺序检查 QQ 是否在线、<code>6199</code> 是否有 Established 连接、DeepSeek Key 是否有效、白名单是否包含当前会话、默认模型是否保存。</p>
+      <h3 id="2310">23.10 私聊正常，群里不回复</h3>
+      <p>检查群会话是否加入白名单、机器人是否被 @、群聊插件是否启用，以及群消息概率是否过低。</p>
+      <h3 id="2311">23.11 机器人过一会儿掉线</h3>
+      <p>检查是否开了两份 NapCat，是否在另一台电脑登录了同一个小号，手机端是否主动退出了电脑设备。新小号还可能触发腾讯安全验证。</p>
+      <p><a href="#contents">↑ 返回目录</a></p>
+      <hr />
+      <h2 id="sec-24">24 安全和隐私</h2>
+      <p>使用小号登录第三方客户端。主号里有联系人、群聊和重要资料，不适合做隔离测试。</p>
+      <p>不要把后台、NapCat WebUI 和 OneBot 端口暴露到公网。默认只绑定 <code>127.0.0.1</code>，不要在路由器上做端口转发。</p>
+      <p>DeepSeek Key、OneBot Token、NapCat WebUI Token、TTS 凭证和后台密码都要单独保管。发布截图前遮挡二维码、Token、账号和设备名。</p>
+      <p>聊天内容会发送给模型提供商。使用云端记忆时，总结后的文本还会发送给嵌入服务。涉及身份证、住址、账号密码和工作文件的内容不要交给机器人。</p>
+      <p>插件来源要确认。不要为了一个表情包或管理页面随便运行来源不明的安装脚本。安装前查看仓库、许可证和最近更新时间。</p>
+      <p>QQ 对第三方登录和自动化消息存在风控。掉线后先看日志和账号状态，连续重试只会增加异常记录。账号被限制时停止自动化操作，按平台要求完成验证。</p>
+      <p><a href="#contents">↑ 返回目录</a></p>
+      <hr />
+      <h2 id="sec-25">25 备份、迁移和重装</h2>
+      <p>AstrBot 的后台配置、人格、插件和聊天数据库都在实例数据目录里。换电脑或重装启动器之前，先停止实例，再把实例目录完整复制出来。</p>
+      <p>只备份 <code>data/plugins</code> 不够。插件配置、插件运行数据、人格和数据库分别在 <code>data</code> 下不同目录，漏掉以后会出现“插件在但配置没了”的情况。</p>
+      <p>迁移到新电脑时，先安装相同或兼容的 AstrBot 版本，再恢复实例数据。版本跨得太大时，先在一份副本上测试，不要直接覆盖唯一的数据库。</p>
+      <p>API Key、OneBot Token 和 TTS 凭证不要写在普通备份说明里。备份包也应该放在加密磁盘或受保护的目录。</p>
+      <p>NapCat 的账号配置和登录缓存位于它自己的版本目录。迁移 NapCat 时，尽量让新电脑重新登录一次，旧登录状态跨设备复制未必有效，也可能增加 QQ 风控。</p>
+      <p>准备彻底卸载时，先在启动器里停止实例并卸载 AstrBot。NapCat 目录和 AstrBot 数据目录是否删除要分别确认。卸载程序不等于删除用户数据，反过来，直接删目录也可能留下后台服务和开机项。</p>
+      <p><a href="#contents">↑ 返回目录</a></p>
+      <hr />
+      <h2 id="sec-26">26 最终检查表</h2>
+      <ul>
+      <li>AstrBot 实例能够启动并打开 WebUI</li>
+      <li>NapCat 只运行一份，登录的是小号</li>
+      <li>OneBot 的 <code>6199</code> 出现 Established</li>
+      <li>AstrBot 日志出现适配器已连接</li>
+      <li>DeepSeek Key 已保存，默认模型已选中</li>
+      <li>主号已加入白名单和管理员</li>
+      <li>陌生人不能直接使用机器人</li>
+      <li>使用电脑能力已关闭或限制</li>
+      <li>后台、WebUI 和 OneBot 都只监听本机</li>
+      <li>API Key 没进入文章、截图或公开仓库</li>
+      <li>语音功能先通过 <code>ffmpeg -version</code> 检查</li>
+      <li>记忆插件单独测试过跨会话检索</li>
+      <li>机器人掉线时可以通过日志分清 QQ、NapCat、AstrBot 和模型问题</li>
+      </ul>
+      <p><a href="#contents">↑ 返回目录</a></p>
+      <hr />
+      <h2 id="sec-27">27 参考资料</h2>
       <ul>
       <li><a href="https://github.com/AstrBotDevs/AstrBot">AstrBot</a></li>
       <li><a href="https://docs.astrbot.app/">AstrBot 官方文档</a></li>
+      <li><a href="https://github.com/AstrBotDevs/astrbot-launcher">AstrBot Launcher</a></li>
       <li><a href="https://github.com/NapNeko/NapCatQQ">NapCatQQ</a></li>
       <li><a href="https://napneko.github.io/">NapCat 官方文档</a></li>
+      <li><a href="https://github.com/botuniverse/onebot-11">OneBot v11</a></li>
       <li><a href="https://platform.deepseek.com/">DeepSeek 开放平台</a></li>
+      <li><a href="https://ollama.com/">Ollama</a></li>
+      <li><a href="https://siliconflow.cn/">硅基流动</a></li>
       </ul>
+      <p><a href="#contents">↑ 返回目录</a></p>
       <div style="text-align:center">
         <a href="../index.html#blog" class="back-link">← Back to Blog</a>
       </div>
