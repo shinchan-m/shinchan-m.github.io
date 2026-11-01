@@ -229,6 +229,7 @@ section { margin: 40px 0; }
    iframe 画布是透明的（见 giscus-light/dark.css），评论直接浮在 .card 上，
    这里只负责外框节奏：和文章同宽、标题与提示文案的间距。 */
 .comments { max-width: 800px; margin: 48px auto 8px; }
+.comments-wide { max-width: none; }   /* 首页留言板：跟其它卡片同宽（main 已限 1100px） */
 .comments h2 { margin-bottom: 6px; }
 .comments-hint { color: var(--text-light); font-size: 0.86em; margin: 0 0 20px; }
 .giscus-box { min-height: 160px; }

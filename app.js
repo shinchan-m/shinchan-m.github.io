@@ -29,7 +29,7 @@
     codeCopy:    true,   // 代码块一键复制
     themeToggle: true,   // 导航栏暗色模式切换按钮
     easterEgg:   true,   // 彩蛋：键盘敲 sakura 触发樱花暴雨
-    comments:    true,   // 文章页评论区（giscus / GitHub Discussions），配置见下面 GISCUS
+    comments:    true,   // 全站评论/留言板（giscus / GitHub Discussions，/book/ 除外），配置见下面 GISCUS
     waifu:       false   // 看板娘 live2d —— 需联网拉 CDN，默认关，说明见文件末尾
   };
 
@@ -886,8 +886,9 @@
   })();
 
   /* ==========================================================
-   * 评论区（giscus）—— 只在 https 的文章页注入
-   *    每篇文章按 pathname 对应一条 Discussion；主题跟站点暗色模式联动。
+   * 评论区 / 留言板（giscus）—— 全站 https 页面都挂，/book/ 除外
+   *    每页按 pathname 对应一条独立 Discussion：文章页=评论区，首页=留言板。
+   *    主题跟站点暗色模式联动。
    * ========================================================== */
   function giscusTheme() {
     // 自定义樱花配色主题（仓库根目录两个 CSS）；比 giscus 自带 light/dark 更贴本站
@@ -896,18 +897,23 @@
   (function initGiscus() {
     if (!FX.comments) return;
     if (!/^https?:$/.test(location.protocol)) return;      // file:// 本地预览不加载
-    if (!document.querySelector(".post-content")) return;  // 只有文章页有评论区
+    if (/\/book\//.test(location.pathname)) return;        // 3D 书店是全屏沉浸场景，不挂评论
     if (!GISCUS.repoId || !GISCUS.categoryId) {
       console.info("🌸 评论区未启用：app.js 顶部 GISCUS.repoId / categoryId 还是空的（填好即亮）。");
       return;
     }
 
+    // 文章页 = 评论区；其余页面（首页等）= 全站留言板。每页按 pathname 对应独立 discussion。
+    var isPost = !!document.querySelector(".post-content");
     var box = document.createElement("section");
     box.className = "comments card";   // 注意：不能带 animate-in——淡入观察器只登记加载时已存在的元素，后插的会永远 opacity:0
+    if (!isPost) box.classList.add("comments-wide");  // 首页等宽卡片页跟其它卡片同宽，文章页保持 800px 正文宽
     box.id = "comments";
     box.innerHTML =
-      '<h2><span class="icon">💬</span> 评论区</h2>' +
-      '<p class="comments-hint">用 GitHub 账号登录后就能留言；讨论同步存放在本博客仓库的 Discussions 里，邮件会通知到我。</p>' +
+      '<h2><span class="icon">' + (isPost ? "💬" : "📮") + "</span> " + (isPost ? "评论区" : "留言板") + "</h2>" +
+      '<p class="comments-hint">' + (isPost
+        ? "用 GitHub 账号登录后就能留言；讨论按文章一一对应，存放在本仓库的 Discussions 里。"
+        : "全站留言板：聊什么都行。用 GitHub 账号登录后即可留言，讨论存放在本仓库的 Discussions 里。") + "</p>" +
       '<div class="giscus-box"></div>';
     var footer = document.querySelector("footer");
     if (footer) footer.parentNode.insertBefore(box, footer);
