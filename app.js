@@ -29,7 +29,23 @@
     codeCopy:    true,   // 代码块一键复制
     themeToggle: true,   // 导航栏暗色模式切换按钮
     easterEgg:   true,   // 彩蛋：键盘敲 sakura 触发樱花暴雨
+    comments:    true,   // 文章页评论区（giscus / GitHub Discussions），配置见下面 GISCUS
     waifu:       false   // 看板娘 live2d —— 需联网拉 CDN，默认关，说明见文件末尾
+  };
+
+  /* ---------- 评论区配置（giscus）----------
+   * 开启步骤（一次性，约 3 分钟）：
+   *   1. 仓库 Settings → Features → 勾选 Discussions；
+   *   2. 装应用：https://github.com/apps/giscus → Install → 只选 shinchan-m.github.io；
+   *   3. 打开 https://giscus.app/zh-CN → 选仓库、选分类（建议新建一个叫 Comments 的分类），
+   *      页面底部会生成一段 script，把 data-repo-id / data-category-id 两个值抄到下面。
+   * repoId / categoryId 为空时本模块自动跳过，不影响任何现有功能。
+   */
+  var GISCUS = {
+    repo:       "shinchan-m/shinchan-m.github.io",
+    repoId:     "",              // ← 抄 giscus.app 生成的 data-repo-id
+    category:   "Comments",      // ← 你在 Discussions 里建的分类名
+    categoryId: ""               // ← 抄 giscus.app 生成的 data-category-id
   };
 
   /* ---------- 公共环境判断 ---------- */
@@ -869,6 +885,66 @@
       console.warn("🌸 看板娘加载失败（CDN 不可达），已跳过，不影响其他功能。");
     };
     document.head.appendChild(s);
+  })();
+
+  /* ==========================================================
+   * 评论区（giscus）—— 只在 https 的文章页注入
+   *    每篇文章按 pathname 对应一条 Discussion；主题跟站点暗色模式联动。
+   * ========================================================== */
+  function giscusTheme() {
+    // 自定义樱花配色主题（仓库根目录两个 CSS）；比 giscus 自带 light/dark 更贴本站
+    return "https://shinchan-m.github.io/giscus-" + (isDarkNow() ? "dark" : "light") + ".css";
+  }
+  (function initGiscus() {
+    if (!FX.comments) return;
+    if (!/^https?:$/.test(location.protocol)) return;      // file:// 本地预览不加载
+    if (!document.querySelector(".post-content")) return;  // 只有文章页有评论区
+    if (!GISCUS.repoId || !GISCUS.categoryId) {
+      console.info("🌸 评论区未启用：app.js 顶部 GISCUS.repoId / categoryId 还是空的（填好即亮）。");
+      return;
+    }
+
+    var box = document.createElement("section");
+    box.className = "comments card animate-in";
+    box.id = "comments";
+    box.innerHTML =
+      '<h2><span class="icon">💬</span> 评论区</h2>' +
+      '<p class="comments-hint">用 GitHub 账号登录后就能留言；讨论同步存放在本博客仓库的 Discussions 里，邮件会通知到我。</p>' +
+      '<div class="giscus-box"></div>';
+    var footer = document.querySelector("footer");
+    if (footer) footer.parentNode.insertBefore(box, footer);
+    else document.body.appendChild(box);
+
+    var s = document.createElement("script");
+    s.src = "https://giscus.app/client.js";
+    s.async = true;
+    s.crossOrigin = "anonymous";
+    s.setAttribute("data-repo", GISCUS.repo);
+    s.setAttribute("data-repo-id", GISCUS.repoId);
+    s.setAttribute("data-category", GISCUS.category);
+    s.setAttribute("data-category-id", GISCUS.categoryId);
+    s.setAttribute("data-mapping", "pathname");   // 一篇文章 = 一条 discussion
+    s.setAttribute("data-strict", "0");
+    s.setAttribute("data-reactions-enabled", "1");
+    s.setAttribute("data-emit-metadata", "0");
+    s.setAttribute("data-input-position", "top");
+    s.setAttribute("data-theme", giscusTheme());
+    s.setAttribute("data-lang", "zh-CN");
+    s.setAttribute("data-loading", "lazy");
+    box.querySelector(".giscus-box").appendChild(s);
+
+    // 站点切主题时，通知 giscus iframe 跟着换（MutationObserver，和切换逻辑零耦合）
+    if (window.MutationObserver) {
+      new MutationObserver(function () {
+        var frame = box.querySelector("iframe.giscus-frame") || box.querySelector("iframe");
+        if (frame && frame.contentWindow) {
+          frame.contentWindow.postMessage(
+            { giscus: { setConfig: { theme: giscusTheme() } } },
+            "https://giscus.app"
+          );
+        }
+      }).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+    }
   })();
 
   /* ---------- 启动 ---------- */

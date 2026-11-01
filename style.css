@@ -1,5 +1,5 @@
 /* ===== 🌸 MJC no Gakushuu Note — Anime Sakura Theme ===== */
-@import url("./vars.css?v=20261019b");
+@import url("./vars.css?v=20261101a");
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -224,6 +224,15 @@ section { margin: 40px 0; }
 .store-entry:hover .store-shelf i:nth-child(3) { transform: rotate(-10deg) translateX(4px); }
 .store-entry:hover .store-shelf i:nth-child(2) { transform: translateY(-6px); }
 .hero-meta { margin-top: 4px; }
+
+/* ===== 评论区（giscus，2026-11 接入）=====
+   iframe 画布是透明的（见 giscus-light/dark.css），评论直接浮在 .card 上，
+   这里只负责外框节奏：和文章同宽、标题与提示文案的间距。 */
+.comments { max-width: 800px; margin: 48px auto 8px; }
+.comments h2 { margin-bottom: 6px; }
+.comments-hint { color: var(--text-light); font-size: 0.86em; margin: 0 0 20px; }
+.giscus-box { min-height: 160px; }
+.giscus-box iframe { width: 100%; border: 0; }
 
 /* Cards */
 .card {

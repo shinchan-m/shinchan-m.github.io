@@ -1,0 +1,98 @@
+/* 🌸 MJC no Gakushuu Note — giscus 评论区自定义主题（亮色 · 樱花）
+ * 变量结构对齐 giscus 官方主题（primer primitives），只换配色。
+ * 由 app.js 的 giscusTheme() 按站点主题切换引用。
+ */
+main {
+  --color-prettylights-syntax-comment: #a08794;
+  --color-prettylights-syntax-constant: #9a4f8f;
+  --color-prettylights-syntax-entity: #8f6bb8;
+  --color-prettylights-syntax-storage-modifier-import: #4a3b47;
+  --color-prettylights-syntax-entity-tag: #4f9d69;
+  --color-prettylights-syntax-keyword: #c25555;
+  --color-prettylights-syntax-string: #46799c;
+  --color-prettylights-syntax-variable: #b07f2c;
+  --color-prettylights-syntax-brackethighlighter-unmatched: #c25555;
+  --color-prettylights-syntax-invalid-illegal-text: #fffafb;
+  --color-prettylights-syntax-invalid-illegal-bg: #8e1519;
+  --color-prettylights-syntax-carriage-return-text: #fffafb;
+  --color-prettylights-syntax-carriage-return-bg: #c25555;
+  --color-prettylights-syntax-string-regexp: #4f9d69;
+  --color-prettylights-syntax-markup-list: #b07f2c;
+  --color-prettylights-syntax-markup-heading: #d4568a;
+  --color-prettylights-syntax-markup-italic: #4a3b47;
+  --color-prettylights-syntax-markup-bold: #4a3b47;
+  --color-prettylights-syntax-markup-deleted-text: #82071e;
+  --color-prettylights-syntax-markup-deleted-bg: #ffebe9;
+  --color-prettylights-syntax-markup-inserted-text: #116329;
+  --color-prettylights-syntax-markup-inserted-bg: #dafbe1;
+  --color-prettylights-syntax-markup-changed-text: #953800;
+  --color-prettylights-syntax-markup-changed-bg: #ffd8b5;
+  --color-prettylights-syntax-markup-ignored-text: #eaeef2;
+  --color-prettylights-syntax-markup-ignored-bg: #46799c;
+  --color-prettylights-syntax-meta-diff-range: #8f6bb8;
+  --color-prettylights-syntax-brackethighlighter-angle: #8a7383;
+  --color-prettylights-syntax-sublimelinter-gutter-mark: #d8c3ce;
+  --color-prettylights-syntax-constant-other-reference-link: #46799c;
+  --color-btn-text: #6b4a5e;
+  --color-btn-bg: #fff0f5;
+  --color-btn-border: rgba(212, 86, 138, 0.25);
+  --color-btn-shadow: 0 1px 0 rgba(212, 86, 138, 0.06);
+  --color-btn-inset-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  --color-btn-hover-bg: #ffe4ee;
+  --color-btn-hover-border: rgba(212, 86, 138, 0.45);
+  --color-btn-active-bg: #ffd9e6;
+  --color-btn-active-border: rgba(212, 86, 138, 0.45);
+  --color-btn-selected-bg: #ffe9f1;
+  --color-btn-primary-text: #ffffff;
+  --color-btn-primary-bg: #e8709a;
+  --color-btn-primary-border: rgba(212, 86, 138, 0.5);
+  --color-btn-primary-shadow: 0 1px 0 rgba(212, 86, 138, 0.2);
+  --color-btn-primary-inset-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  --color-btn-primary-hover-bg: #d4568a;
+  --color-btn-primary-hover-border: rgba(212, 86, 138, 0.6);
+  --color-btn-primary-selected-bg: #c94b7d;
+  --color-btn-primary-selected-shadow: inset 0 1px 0 rgba(120, 20, 60, 0.2);
+  --color-btn-primary-disabled-text: rgba(255, 255, 255, 0.8);
+  --color-btn-primary-disabled-bg: #f3aec6;
+  --color-btn-primary-disabled-border: rgba(212, 86, 138, 0.3);
+  --color-action-list-item-default-hover-bg: rgba(232, 112, 154, 0.12);
+  --color-segmented-control-bg: rgba(232, 112, 154, 0.08);
+  --color-segmented-control-button-bg: #fffafb;
+  --color-segmented-control-button-selected-border: #e8709a;
+  --color-fg-default: #4a3b47;
+  --color-fg-muted: #8a7383;
+  --color-fg-subtle: #a98f9f;
+  --color-canvas-default: transparent;
+  --color-canvas-overlay: #ffffff;
+  --color-canvas-inset: rgba(232, 112, 154, 0.10);
+  --color-canvas-subtle: rgba(232, 112, 154, 0.07);
+  --color-border-default: #f0c9da;
+  --color-border-muted: #f7dce8;
+  --color-neutral-muted: rgba(232, 112, 154, 0.14);
+  --color-accent-fg: #d4568a;
+  --color-accent-emphasis: #e8709a;
+  --color-accent-muted: rgba(232, 112, 154, 0.4);
+  --color-accent-subtle: rgba(232, 112, 154, 0.1);
+  --color-success-fg: #4f9d69;
+  --color-attention-fg: #b07f2c;
+  --color-attention-muted: rgba(176, 127, 44, 0.4);
+  --color-attention-subtle: rgba(176, 127, 44, 0.12);
+  --color-danger-fg: #c25555;
+  --color-danger-muted: rgba(194, 85, 85, 0.4);
+  --color-danger-subtle: rgba(194, 85, 85, 0.1);
+  --color-primer-shadow-inset: inset 0 1px 0 rgba(212, 86, 138, 0.06);
+  --color-scale-gray-7: #f3d3e0;
+  --color-scale-blue-8: #f0c9da;
+
+  /* giscus 表情反应按钮 */
+  --color-social-reaction-bg-hover: var(--color-scale-gray-7);
+  --color-social-reaction-bg-reacted-hover: var(--color-scale-blue-8);
+}
+
+main .pagination-loader-container {
+  background-image: url("https://github.com/images/modules/pulls/progressive-disclosure-line-light.svg");
+}
+
+main .gsc-loading-image {
+  background-image: url("https://github.githubassets.com/images/mona-loading-determined.gif");
+}
