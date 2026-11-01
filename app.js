@@ -903,7 +903,7 @@
     }
 
     var box = document.createElement("section");
-    box.className = "comments card animate-in";
+    box.className = "comments card";   // 注意：不能带 animate-in——淡入观察器只登记加载时已存在的元素，后插的会永远 opacity:0
     box.id = "comments";
     box.innerHTML =
       '<h2><span class="icon">💬</span> 评论区</h2>' +
