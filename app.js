@@ -34,18 +34,16 @@
   };
 
   /* ---------- 评论区配置（giscus）----------
-   * 开启步骤（一次性，约 3 分钟）：
-   *   1. 仓库 Settings → Features → 勾选 Discussions；
-   *   2. 装应用：https://github.com/apps/giscus → Install → 只选 shinchan-m.github.io；
-   *   3. 打开 https://giscus.app/zh-CN → 选仓库、选分类（建议新建一个叫 Comments 的分类），
-   *      页面底部会生成一段 script，把 data-repo-id / data-category-id 两个值抄到下面。
+   * 已于 2026-11-01 配置完成：Discussions 已开启、giscus app 已装、
+   * 分类用仓库默认的 General，四个值抄自 giscus.app 生成的 script。
+   * 想换独立分类：Discussions 里新建分类 → giscus.app 重抄 category / categoryId。
    * repoId / categoryId 为空时本模块自动跳过，不影响任何现有功能。
    */
   var GISCUS = {
     repo:       "shinchan-m/shinchan-m.github.io",
-    repoId:     "",              // ← 抄 giscus.app 生成的 data-repo-id
-    category:   "Comments",      // ← 你在 Discussions 里建的分类名
-    categoryId: ""               // ← 抄 giscus.app 生成的 data-category-id
+    repoId:     "R_kgDOTLjBZw",          // 2026-11-01 由 giscus.app 生成填入
+    category:   "General",               // 仓库 Discussions 默认分类
+    categoryId: "DIC_kwDOTLjBZ84DKJP3"   // 同上
   };
 
   /* ---------- 公共环境判断 ---------- */
