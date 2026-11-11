@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>个人版 Microsoft Copilot 的编程 Agent 接入研究 | MJC no Gakushuu Note</title>
+<meta name="description" content="检查消费者 Copilot 与三个代理项目，用四组离线实验区分普通聊天兼容、模型标签和真正的工具调用。附固定提交与可复现脚本。">
+<!-- 首屏前定好主题，暗色模式下不会闪一下白 -->
+<script>(function(){try{var s=localStorage.getItem('mjc-theme');var d=s==='dark'||(s!=='light'&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.setAttribute('data-theme',d?'dark':'light')}catch(e){document.documentElement.setAttribute('data-theme','light')}})()</script>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%B8%3C/text%3E%3C/svg%3E">
+<meta name="theme-color" content="#FFF0F5">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="MJC no Gakushuu Note">
+<meta property="og:title" content="个人版 Microsoft Copilot 的编程 Agent 接入研究">
+<meta property="og:description" content="检查消费者 Copilot 与三个代理项目，用四组离线实验区分普通聊天兼容、模型标签和真正的工具调用。附固定提交与可复现脚本。">
+<meta property="og:url" content="https://shinchan-m.github.io/posts/copilot-personal-agent-research.html">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-11-11">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="个人版 Microsoft Copilot 的编程 Agent 接入研究">
+<meta name="twitter:description" content="检查消费者 Copilot 与三个代理项目，用四组离线实验区分普通聊天兼容、模型标签和真正的工具调用。附固定提交与可复现脚本。">
+<link rel="stylesheet" href="../style.css?v=20261101d">
+<style>
+  .post-header { text-align:center; padding:80px 20px 30px; }
+  .post-header h1 { font-size:2em; color:var(--text); margin-bottom:16px; }
+  .post-meta { color:var(--text-light); font-size:0.9em; margin-bottom:12px; }
+  .post-content { max-width:800px; margin:0 auto; padding:20px; }
+  .post-content h2 { font-size:1.4em; color:var(--sakura-dark); margin:32px 0 12px; padding-left:12px; border-left:4px solid var(--sakura); }
+  .post-content h3 { font-size:1.1em; margin:24px 0 8px; color:var(--text); }
+  .post-content p { margin-bottom:16px; font-size:1.05em; line-height:2; }
+  .post-content ul, .post-content ol { margin:12px 0 20px 24px; }
+  .post-content li { margin-bottom:8px; line-height:1.8; }
+  .post-content code { background:rgba(255,158,197,0.12); padding:2px 8px; border-radius:4px; font-size:0.9em; font-family:"Cascadia Code","Fira Code",monospace; }
+  .post-content pre { background:#2d2438; color:#f5eef8; padding:16px 18px; border-radius:8px; overflow-x:auto; margin:16px 0; line-height:1.7; }
+  .post-content pre code { background:none; padding:0; color:inherit; font-size:0.9em; }
+  .post-content table { width:100%; border-collapse:collapse; margin:20px 0; }
+  .post-content th { background:linear-gradient(135deg,rgba(255,158,197,0.2),rgba(200,112,232,0.15)); padding:10px 12px; text-align:left; }
+  .post-content td { padding:10px 12px; border-bottom:1px solid var(--card-border); }
+  .post-content strong { color:var(--sakura-dark); }
+  .post-content blockquote { border-left:4px solid var(--sky); margin:16px 0; padding:8px 16px; color:var(--text-light); background:rgba(168,216,234,0.1); border-radius:0 8px 8px 0; }
+  .back-link { display:inline-block; margin:40px 0; color:var(--sakura-dark); text-decoration:none; font-size:0.95em; }
+  .back-link:hover { text-decoration:underline; }
+  @media(max-width:768px){ .post-content { padding:16px; } .post-header h1 { font-size:1.4em; } }
+</style>
+</head>
+<body>
+<canvas id="sakura-canvas"></canvas>
+<nav>
+  <div class="nav-inner">
+    <span class="nav-logo">🌸 MJC no Gakushuu Note</span>
+    <div class="nav-links">
+      <a href="../index.html">Home</a>
+      <a href="../index.html#blog">Blog</a>
+      <a href="../book/index.html">书店</a>
+    </div>
+  </div>
+</nav>
+<main>
+  <article>
+    <div class="post-header">
+      <h1>个人版 Microsoft Copilot 的编程 Agent 接入研究</h1>
+      <div class="post-meta">📅 2026-11-11 &nbsp;|&nbsp; <span class="tag t-ai">AI Agent</span> <span class="tag t-java">Copilot</span> <span class="tag t-java">源码研究</span></div>
+      <p style="color:var(--text-light);max-width:600px;margin:12px auto;font-size:0.95em">检查消费者 Copilot 与三个代理项目，用四组离线实验区分普通聊天兼容、模型标签和真正的工具调用。附固定提交与可复现脚本。</p>
+    </div>
+    <div class="post-content card">
+      <p>已经订阅 Microsoft 365 或 Copilot，能不能把这份订阅接到 Codex、Claude Code 或 Hermes，省下一套模型 API 费用。</p>
+      <p>这次调查围绕这个问题，检查了三个代理项目的源码，核对微软与客户端的官方文档，并运行了四组离线实验。资料核验截至 2026 年 11 月 11 日。实验没有登录个人账号，也没有向 Copilot 发送聊天请求，因此本文能确认的是代理实现与测试断言的行为，个人账号的实际可用性仍待验证。</p>
+      <p>已经有了一个值得继续做下去的发现。较新的消费者版实现也使用了 Microsoft 365 Copilot 的 SignalR 聊天地址，原项目的传输层可能比最初估计的更容易复用。</p>
+      <p>这条线索来自 Windows-Copilot-API 在 2026 年 10 月 30 日的提交。固定到该提交后，<code>copilot/protocol.py</code> 使用的地址是 <code>substrate.office.com/m365Copilot/Chathub/{oid}@{tenant}</code>，与 m365-copilot-proxy 属于同一条地址形式。[1]</p>
+      <p>调查中还对公开网页做了一次普通 HTTP 访问。访问 <code>copilot.microsoft.com</code> 后，最终地址为 <code>copilot.com</code>，返回状态为 200，页面标题是登录页，HTML 中也出现了对 <code>substrate.office.com</code> 的 DNS 预取。这个观察确认了公开入口的跳转，尚不能证明登录后的聊天接口一定可用。</p>
+      <p>两个实现仍有实质差异。消费者项目采用个人账号的令牌刷新流程与身份路由，连接参数固定为 <code>OfficeWebFreeConsumerCopilot</code> 和 <code>Free</code>。企业项目原有的登录方式不能因此直接照搬。开发方向可以收窄到消费者认证、场景参数和会话适配，再检查现有的消息解析是否适用。</p>
+      <p>付费订阅也需要单独核实。这个消费者项目固定使用 <code>Magic</code>，请求里的 <code>model</code> 只用于返回标签，没有传给后端的聊天方法。源码里未看到个人 Premium、Pro 等订阅权益的映射。用它得到一条标着某个模型名字的回答，仍不足以证明请求进入了那个模型，或使用了个人订阅的额外权益。[2]</p>
+      <p>这个区别在其他代理里同样存在。另一个项目 copilot-wraper 提供了 <code>/v1/messages</code>，还列出了一些客户端接入结果。继续看请求模型，会发现它明确把 <code>tools</code> 等扩展字段接受后忽略；非流式 Anthropic 响应只包含文本块。[3] 从结构看它实现了普通问答所需的接口，文件读取和编辑仍缺少工具调用所需的处理，本次没有实测它的聊天连通性。</p>
+      <p>m365-copilot-proxy 自己实现了代码块工具解析，走得更远一些。不过，它的一项工具测试也有容易被高估的地方。</p>
+      <p>离线复现保留了 <code>index.test.ts</code> 中的测试正文，仅把测试运行器和应用入口换成完全本地的替身。聊天替身始终返回一段普通文字，明确表示没有运行工具。它不连接网络，也不会执行模型命令。</p>
+      <p>结果如下。</p>
+      <table>
+      <thead>
+      <tr>
+      <th>检查项</th>
+      <th>离线结果</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+      <td>原测试文件通过数量</td>
+      <td>3 项</td>
+      </tr>
+      <tr>
+      <td>聊天请求数量</td>
+      <td>1 次</td>
+      </tr>
+      <tr>
+      <td>返回的工具调用</td>
+      <td>0 次</td>
+      </tr>
+      <tr>
+      <td>实际执行工具</td>
+      <td>0 次</td>
+      </tr>
+      </tbody>
+      </table>
+      <p>原因可以直接在原测试里找到。只有回答包含 <code>tool_calls</code>，测试才进入执行与回传结果的分支。模型给出普通文本时，另一个分支只要求内容非空。健康检查和模型列表测试也会照常通过。[4]</p>
+      <p>这组实验限定的是测试能证明的范围。它没有测量真实 Copilot 的工具调用成功率，也不能据此评价整个项目的质量。它足以提醒我们，一份带有“工具调用”名称的测试通过以后，还要看断言是否真的要求工具运行。</p>
+      <p>随后又运行了项目里的模型路由函数和能力描述函数。它们给出了另外两项确定的结果。</p>
+      <table>
+      <thead>
+      <tr>
+      <th>输入或检查</th>
+      <th>原代码的离线输出</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+      <td>完全不存在的模型名</td>
+      <td>路由到 <code>magic</code></td>
+      </tr>
+      <tr>
+      <td>虚构的 <code>claude</code> 开头模型名</td>
+      <td>路由到 <code>Claude_Sonnet</code></td>
+      </tr>
+      <tr>
+      <td>为本地假模型构建能力描述</td>
+      <td>输入与输出上限均显示为 100 万 token</td>
+      </tr>
+      </tbody>
+      </table>
+      <p>原代码为未知名字提供了回退规则，响应中的 <code>model</code> 字段也沿用请求解析后的模型变量。它适合标识一次请求使用的代理配置，却不能独立充当上游模型身份的证据。[5]</p>
+      <p>100 万 token 同样来自代理自身的默认值。源码注释已经说明，这些数字用于避免客户端过早裁剪内容，属于对外提示，不是上游保证的窗口和输出能力。[6] 博客、配置页面和评测如果引用这个数字，应当保留这层说明。</p>
+      <p>最后一组实验直接运行原工具解析器。提供一个名为 <code>shell</code>、参数为 <code>command</code> 的工具后，模型样例中的 <code>bash</code> 代码块会被转成 <code>shell</code> 调用。纯文本的“已经修好了”则不会产生调用。带一句简短建议的 <code>bash</code> 代码块，也可以被识别为动作。[7]</p>
+      <p>这说明工具能力还有一项需要认真验证的语义问题。代理可以把代码块变成结构化调用，但最终是否需要执行、执行结果是否回传、模型是否根据真实报错继续修改，要由完整的 Agent 循环来证明。此次解析实验没有执行任何样例命令。</p>
+      <p>三个客户端的工作量也有差别。Hermes 支持自定义 Chat Completions，最接近现有项目的接口。Codex 当前的自定义提供方要求 Responses 协议。Claude Code 的自定义网关需要 Anthropic Messages，还要求完整的流式事件。[8][9][10] 同时接三者，会把消费者通道与客户端兼容问题混在一起，定位失败会更困难。</p>
+      <p>微软官方 Chat API 目前也不能替代这项消费者适配。它的权限表明确不支持个人微软账号，许可要求写的是 Microsoft 365 Copilot add-on。个人订阅中的网页使用权益，不能直接推导为该企业 API 的调用权限。[11]</p>
+      <p>经过这一轮研究，值得继续做的路线已经更具体了。先验证正常登录后的消费者聊天通道，再复用已有的 SignalR 解析与代码块工具转换，只给 Hermes 提供少量工具，完成一次真实的读取、修改与检查。登录能持续多久、付费权益怎样体现、模型能否根据工具结果连续行动，都留给这一轮实际调用记录回答。</p>
+      <p>当前成果是一份可复查的源码调查和离线实验。还不能把它写成个人 Copilot 已经稳定接入 Codex、Claude Code 或 Hermes 的成功教程。</p>
+      <h2 id="_1">来源与复现</h2>
+      <p>目标项目固定提交为 <code>65905e881d6597040966aff9b087aa9a908b358a</code>。消费者参考实现固定提交为 <code>5b933d416e7e09095fc85ec9b895e28f8a2635de</code>。本次运行环境为 Node.js 24.18.0。</p>
+      <p>完整材料保存在 <a href="https://github.com/shinchan-m/shinchan-m.github.io/tree/main/research/copilot-personal-agent">GitHub 研究目录</a>，包括复现脚本、原始结果和详细证据。脚本读取已有源码并在内存中执行相关函数，无需安装第三方依赖。运行方法和实验边界见该目录中的 README 与 evidence.md。</p>
+      <ol>
+      <li><a href="https://github.com/sums001/Windows-Copilot-API/blob/5b933d416e7e09095fc85ec9b895e28f8a2635de/copilot/protocol.py">消费者聊天协议源码</a></li>
+      <li><a href="https://github.com/sums001/Windows-Copilot-API/blob/5b933d416e7e09095fc85ec9b895e28f8a2635de/server/api.py">消费者代理请求处理</a></li>
+      <li><a href="https://github.com/zumanm1/copilot-wraper/blob/6d807c5939af2364a7224b4b785d581caf699cf4/models.py">另一代理对工具字段的处理</a>与<a href="https://github.com/zumanm1/copilot-wraper/blob/6d807c5939af2364a7224b4b785d581caf699cf4/server.py">文本响应实现</a></li>
+      <li><a href="https://github.com/cramt/m365-copilot-proxy/blob/65905e881d6597040966aff9b087aa9a908b358a/packages/proxy-lib/src/index.test.ts">目标项目的原始集成测试</a></li>
+      <li><a href="https://github.com/cramt/m365-copilot-proxy/blob/65905e881d6597040966aff9b087aa9a908b358a/packages/core/src/copilot.ts">目标项目的模型路由</a></li>
+      <li><a href="https://github.com/cramt/m365-copilot-proxy/blob/65905e881d6597040966aff9b087aa9a908b358a/packages/proxy-lib/src/index.ts">目标项目的模型能力提示值</a></li>
+      <li><a href="https://github.com/cramt/m365-copilot-proxy/blob/65905e881d6597040966aff9b087aa9a908b358a/packages/core/src/tools.ts">目标项目的工具解析实现</a></li>
+      <li><a href="https://hermes-agent.nousresearch.com/docs/integrations/providers">Hermes 自定义提供方文档</a></li>
+      <li><a href="https://developers.openai.com/codex/config-reference/">Codex 官方配置参考</a></li>
+      <li><a href="https://code.claude.com/docs/en/llm-gateway-protocol.md">Claude Code 网关协议</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/microsoft-365/copilot/extensibility/api/ai-services/chat/copilotroot-post-conversations">微软 Chat API 权限表</a>与<a href="https://learn.microsoft.com/en-us/microsoft-365/copilot/extensibility/api/ai-services/chat/overview">许可要求</a></li>
+      </ol>
+      <div style="text-align:center">
+        <a href="../index.html#blog" class="back-link">← Back to Blog</a>
+      </div>
+    </div>
+  </article>
+</main>
+<footer>
+  <p>🌸 <a href="https://shinchan-m.github.io">shinchan-m.github.io</a> · <a href="https://github.com/shinchan-m" target="_blank" rel="noopener">GitHub ↗</a> · 江南大学 2025 · Java Backend</p>
+</footer>
+<script src="../app.js?v=20261101d"></script>
+</body>
+</html>

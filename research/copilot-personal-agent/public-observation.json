@@ -1,0 +1,10 @@
+{
+  "ObservedAtUtc": "2026-11-11T15:04:58.1229423Z",
+  "Request": "https://copilot.microsoft.com/",
+  "Status": 200,
+  "FinalUrl": "https://copilot.com/",
+  "Title": "Microsoft Copilot | Sign in",
+  "ContainsSubstrateDnsPrefetch": true,
+  "Authenticated": false,
+  "ChatRequests": 0
+}

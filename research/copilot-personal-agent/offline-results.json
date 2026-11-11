@@ -1,0 +1,104 @@
+{
+  "timestamp": "2026-11-11T15:18:38.092Z",
+  "node": "v24.18.0",
+  "upstreamRequests": 0,
+  "actualToolExecutions": 0,
+  "targetCommit": "65905e881d6597040966aff9b087aa9a908b358a",
+  "sourceHashes": {
+    "packages/proxy-lib/src/index.test.ts": "e453b854ad6e5c706239e20ba1b7323a82fd1fb2a0da19e8303298436563bf08",
+    "packages/core/src/copilot.ts": "7e7faa941a3133929b60f8efd8257ba169161c2081c419268459a6d0f9068b0f",
+    "packages/proxy-lib/src/index.ts": "b9e84802fd71856903ddde887d9b2a650ff520321e481fd9e3740c70ce2ef9d2",
+    "packages/core/src/fenced.ts": "b7e6c2f726bc0a5dbd4a7bfe9eb6ce3b9453d5cd3869cf907c92d98137652085",
+    "packages/core/src/tools.ts": "388fcdf15cdaf8adc7aa372ec0629c85674ce241afaf0614ce8122b8c2704e78"
+  },
+  "findings": {
+    "liveTestCounterexample": {
+      "passed": 3,
+      "testNames": [
+        "should handle a chat completion with tools defined",
+        "should return models list",
+        "should return health check"
+      ],
+      "chatRequests": 1,
+      "toolCalls": 0,
+      "executedTools": 0,
+      "scope": "Original test assertions with a local fake app; not an upstream success-rate test."
+    },
+    "modelRouting": [
+      {
+        "requestedModel": "arbitrary-nonexistent-model",
+        "upstreamTone": "magic"
+      },
+      {
+        "requestedModel": "claude-entirely-made-up-model",
+        "upstreamTone": "Claude_Sonnet"
+      },
+      {
+        "requestedModel": "claude-sonnet-4.5",
+        "upstreamTone": "Claude_Sonnet"
+      },
+      {
+        "requestedModel": "claude-sonnet-4.6",
+        "upstreamTone": "Claude_Sonnet"
+      },
+      {
+        "requestedModel": "claude-opus-4.5",
+        "upstreamTone": "Claude_Opus"
+      },
+      {
+        "requestedModel": "claude-opus-4.8",
+        "upstreamTone": "Claude_Opus"
+      }
+    ],
+    "advertisedCapabilities": {
+      "id": "offline-fixture",
+      "object": "model",
+      "created": 1794410318,
+      "owned_by": "microsoft",
+      "context_window": 1000000,
+      "max_context_length": 1000000,
+      "max_input_tokens": 1000000,
+      "max_output_tokens": 1000000
+    },
+    "toolParsing": [
+      {
+        "sample": "explicit-fence",
+        "raw": "```bash\nprintf hello\n```",
+        "hasToolCalls": true,
+        "toolCalls": [
+          {
+            "name": "shell",
+            "arguments": {
+              "command": "printf hello"
+            }
+          }
+        ],
+        "remainingText": null,
+        "classifiedAsProseDocument": false
+      },
+      {
+        "sample": "completion-claim",
+        "raw": "I already fixed the file successfully.",
+        "hasToolCalls": false,
+        "toolCalls": [],
+        "remainingText": "I already fixed the file successfully.",
+        "classifiedAsProseDocument": false
+      },
+      {
+        "sample": "short-advice-with-fence",
+        "raw": "You can run this command:\n```bash\nls -la\n```",
+        "hasToolCalls": true,
+        "toolCalls": [
+          {
+            "name": "shell",
+            "arguments": {
+              "command": "ls -la"
+            }
+          }
+        ],
+        "remainingText": "You can run this command:",
+        "classifiedAsProseDocument": false
+      }
+    ]
+  }
+}
